@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conversly — Who Do You Communicate Like?</title>
+<link rel="icon" type="image/png" href="https://image2url.com/r2/default/images/1774918418130-4e79b709-ee19-4d3c-bf03-1d3f1eafc6e6.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════ DESIGN TOKENS */
+:root {
+  --bg:         #06040D;
+  --bg2:        #0A0618;
+  --bg3:        #0D0820;
+  --surf:       rgba(20,10,52,0.76);
+  --surf2:      rgba(255,255,255,0.024);
+  --surf3:      rgba(255,255,255,0.012);
+  --glass:      rgba(32,14,80,0.6);
+  --border:     rgba(255,255,255,0.072);
+  --border2:    rgba(255,255,255,0.038);
+  --border3:    rgba(255,255,255,0.016);
+  --vi:         #7B3FF2;
+  --vi-hi:      #9D6FFF;
+  --vi-bright:  #BFA6FF;
+  --vi-dim:     #3D1A8A;
+  --vi-pale:    #C4B5FD;
+  --vi-glow:    rgba(123,63,242,0.22);
+  --vi-glow2:   rgba(157,111,255,0.1);
+  --sel-bg:     rgba(123,63,242,0.09);
+  --sel-b:      rgba(157,111,255,0.46);
+  --gold:       #C9920A;
+  --gold-hi:    #E5B830;
+  --gold-pale:  #F0D080;
+  --gold-glow:  rgba(201,146,10,0.2);
+  --txt:        #F2EEF9;
+  --txt2:       rgba(210,195,240,0.72);
+  --txt3:       rgba(165,145,210,0.5);
+  --txt4:       rgba(110,90,160,0.32);
+  --teal:       #38C9A7;
+  --cr:         24px;
+  --cr2:        18px;
+  --or:         16px;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{height:100%;background:var(--bg);scroll-behavior:smooth;}
+body{min-height:100%;background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+button{font-family:'DM Sans',sans-serif;}
+a{text-decoration:none;}
+
+/* ════════════════════════════ BACKGROUND */
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);animation:orbf ease-in-out infinite;}
+.o1{width:900px;height:900px;background:radial-gradient(circle,rgba(70,20,160,0.5) 0%,transparent 60%);top:-320px;left:-240px;animation-duration:36s;}
+.o2{width:700px;height:700px;background:radial-gradient(circle,rgba(40,10,120,0.32) 0%,transparent 60%);bottom:-200px;right:-180px;animation-duration:42s;animation-delay:-16s;}
+.o3{width:500px;height:500px;background:radial-gradient(circle,rgba(123,63,242,0.18) 0%,transparent 60%);top:36%;right:8%;animation-duration:28s;animation-delay:-8s;}
+.o4{width:340px;height:340px;background:radial-gradient(circle,rgba(201,146,10,0.07) 0%,transparent 60%);top:20%;left:30%;animation-duration:48s;animation-delay:-24s;}
+.o5{width:260px;height:260px;background:radial-gradient(circle,rgba(157,111,255,0.09) 0%,transparent 60%);bottom:28%;left:6%;animation-duration:32s;animation-delay:-6s;}
+@keyframes orbf{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(28px,-22px) scale(1.07);}66%{transform:translate(-20px,28px) scale(0.94);}}
+
+.bg-grid{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:linear-gradient(rgba(123,63,242,0.016) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(123,63,242,0.016) 1px,transparent 1px);
+  background-size:72px 72px;}
+
+.bg-noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0.022;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");}
+
+/* ════════════════════════════ LAYOUT */
+.app{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;}
+
+/* ════════════════════════════ HEADER */
+.hdr{padding:22px 40px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:20;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-gem{width:26px;height:26px;position:relative;flex-shrink:0;}
+.logo-gem svg{width:100%;height:100%;}
+.logo-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--txt);letter-spacing:-0.01em;}
+.q-counter{font-size:11px;color:var(--txt3);letter-spacing:0.12em;font-weight:500;}
+
+/* ════════════════════════════ PROGRESS */
+.prog-wrap{padding:14px 40px 0;flex-shrink:0;z-index:20;}
+.prog-track{height:2px;background:rgba(255,255,255,0.05);border-radius:99px;position:relative;overflow:visible;}
+.prog-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1);position:relative;
+  background:linear-gradient(90deg,#3D1A8A 0%,#7B3FF2 40%,#9D6FFF 72%,#C4B5FD 100%);
+  box-shadow:0 0 12px rgba(157,111,255,0.6),0 0 28px rgba(123,63,242,0.22);}
+.prog-fill::after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);
+  width:7px;height:7px;background:#fff;border-radius:50%;
+  box-shadow:0 0 8px rgba(255,255,255,0.8),0 0 16px rgba(157,111,255,1);}
+.prog-fill::before{content:'';position:absolute;inset:0;border-radius:99px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3) 50%,transparent);
+  background-size:200px 100%;animation:shimmer 3s linear infinite;}
+@keyframes shimmer{0%{background-position:-200px 0;}100%{background-position:600px 0;}}
+.prog-milestones{display:flex;justify-content:space-between;padding:0 1px;margin-top:7px;}
+.prog-ms{font-size:9.5px;color:var(--txt4);letter-spacing:0.08em;transition:color .4s;}
+.prog-ms.passed{color:var(--vi-pale);}
+
+/* ════════════════════════════ SCREENS */
+.screens{flex:1;position:relative;z-index:10;padding:24px 16px 80px;
+  display:flex;align-items:flex-start;justify-content:center;}
+.screens-spacer{display:block;width:100%;max-width:600px;visibility:hidden;pointer-events:none;}
+
+/* ════════════════════════════ GLASS CARD */
+.card{
+  width:100%;max-width:596px;
+  background:var(--surf);
+  backdrop-filter:blur(56px) saturate(1.4);
+  -webkit-backdrop-filter:blur(56px) saturate(1.4);
+  border:1px solid var(--border);
+  border-radius:var(--cr);
+  padding:46px 46px 40px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.028),
+    inset 0 1px 0 rgba(255,255,255,0.055),
+    0 8px 32px rgba(0,0,0,0.45),
+    0 32px 80px rgba(0,0,0,0.75),
+    0 0 80px rgba(123,63,242,0.05);
+  position:absolute;top:24px;left:50%;transform:translateX(-50%);
+  transition:opacity .42s cubic-bezier(.4,0,.2,1),transform .42s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(157,111,255,0.55) 25%,rgba(220,210,255,0.4) 50%,rgba(157,111,255,0.55) 75%,transparent);
+  animation:topAcc 6s ease-in-out infinite;}
+@keyframes topAcc{0%,100%{opacity:0.7;}50%{opacity:1;}}
+.card.active{opacity:1;transform:translateX(-50%) scale(1);pointer-events:all;}
+.card.out-l{opacity:0;transform:translateX(calc(-50% - 56px)) scale(.964);pointer-events:none;}
+.card.out-r{opacity:0;transform:translateX(calc(-50% + 56px)) scale(.964);pointer-events:none;}
+.card.in-r{opacity:0;transform:translateX(calc(-50% + 56px)) scale(.964);pointer-events:none;}
+.card.in-l{opacity:0;transform:translateX(calc(-50% - 56px)) scale(.964);pointer-events:none;}
+.card-c{width:100%;max-width:612px;position:absolute;top:24px;left:50%;transform:translateX(-50%);
+  transition:opacity .46s cubic-bezier(.4,0,.2,1),transform .46s cubic-bezier(.4,0,.2,1);}
+.card-c.active{opacity:1;transform:translateX(-50%) translateY(0) scale(1);pointer-events:all;}
+.card-c.gone{opacity:0;transform:translateX(-50%) translateY(24px) scale(.97);pointer-events:none;}
+
+/* ════════════════════════════ SKELETON */
+.skel-overlay{position:absolute;inset:0;border-radius:inherit;background:var(--surf);
+  padding:46px 46px 40px;z-index:30;pointer-events:none;
+  animation:skelFadeOut 0.48s cubic-bezier(.4,0,.2,1) 0.22s forwards;
+  backdrop-filter:blur(56px);-webkit-backdrop-filter:blur(56px);}
+@keyframes skelFadeOut{0%{opacity:1;}100%{opacity:0;visibility:hidden;}}
+.skel-line{border-radius:8px;
+  background:linear-gradient(90deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.08) 40%,rgba(255,255,255,0.04) 80%);
+  background-size:480px 100%;animation:skelShimmer 1.5s ease-in-out infinite;margin-bottom:10px;}
+@keyframes skelShimmer{0%{background-position:-480px 0;}100%{background-position:480px 0;}}
+.sk-tag{height:11px;width:118px;margin-bottom:18px;}
+.sk-h1{height:32px;width:88%;margin-bottom:8px;}
+.sk-h2{height:26px;width:64%;margin-bottom:18px;}
+.sk-sub1{height:13px;width:95%;margin-bottom:8px;}
+.sk-sub2{height:13px;width:72%;margin-bottom:24px;}
+.sk-opt{height:52px;border-radius:16px;margin-bottom:8px;}
+.sk-opt2{height:52px;border-radius:16px;margin-bottom:8px;opacity:.78;}
+.sk-opt3{height:52px;border-radius:16px;margin-bottom:8px;opacity:.56;}
+.sk-opt4{height:52px;border-radius:16px;opacity:.36;}
+.card-c .skel-overlay{padding:44px 44px 40px;}
+
+/* ════════════════════════════ Q ANATOMY */
+.q-tag{display:inline-flex;align-items:center;gap:7px;
+  font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold-hi);margin-bottom:14px;}
+.q-dot{width:5px;height:5px;background:var(--gold-hi);border-radius:50%;
+  box-shadow:0 0 8px var(--gold-hi),0 0 14px rgba(229,184,48,0.5);
+  animation:pulse 2.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.3;transform:scale(1.8);}}
+.q-text{font-family:'Playfair Display',serif;font-size:27px;font-weight:600;line-height:1.28;
+  color:var(--txt);margin-bottom:8px;letter-spacing:-.02em;}
+.q-sub{font-size:13.5px;color:var(--txt2);margin-bottom:26px;line-height:1.65;font-weight:300;}
+.q-note{display:inline-flex;align-items:center;gap:7px;font-size:11px;color:var(--vi-pale);
+  background:rgba(123,63,242,.06);border:1px solid rgba(123,63,242,.16);
+  border-radius:99px;padding:5px 13px;margin-bottom:18px;}
+
+/* ════════════════════════════ OPTIONS */
+.opts{display:flex;flex-direction:column;gap:8px;}
+.opt{background:var(--surf2);border:1px solid var(--border3);border-radius:var(--or);
+  padding:14px 18px;cursor:pointer;
+  transition:all .22s cubic-bezier(.4,0,.2,1);
+  display:flex;align-items:center;justify-content:space-between;
+  text-align:left;width:100%;color:var(--txt2);
+  font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:400;position:relative;overflow:hidden;}
+.opt-glow{position:absolute;inset:0;opacity:0;transition:opacity .22s;pointer-events:none;
+  background:linear-gradient(135deg,rgba(123,63,242,0.07) 0%,transparent 60%);}
+.opt-accent{position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(to bottom,transparent,var(--vi-hi),transparent);
+  opacity:0;transition:opacity .22s;}
+.opt:hover{background:rgba(255,255,255,0.038);border-color:rgba(123,63,242,.26);
+  color:var(--txt);transform:translateY(-1px);
+  box-shadow:0 4px 18px rgba(0,0,0,.32),0 0 24px rgba(123,63,242,.07);}
+.opt:hover .opt-glow{opacity:1;}
+.opt:hover .opt-accent{opacity:.5;}
+.opt.sel{background:var(--sel-bg);border-color:var(--sel-b);color:var(--txt);
+  box-shadow:0 0 0 1px rgba(123,63,242,.18),0 6px 24px rgba(123,63,242,.14);}
+.opt.sel .opt-glow{opacity:1;}
+.opt.sel .opt-accent{opacity:1;}
+.opt-lbl{flex:1;line-height:1.45;}
+.opt-radio{width:19px;height:19px;border-radius:50%;border:1.5px solid rgba(255,255,255,.14);
+  flex-shrink:0;transition:all .22s;display:flex;align-items:center;justify-content:center;}
+.opt.sel .opt-radio{background:var(--vi);border-color:var(--vi-hi);
+  box-shadow:0 0 12px rgba(123,63,242,.6),0 0 24px rgba(123,63,242,.22);}
+.chk{width:8px;height:8px;opacity:0;transition:opacity .15s;}
+.opt.sel .chk{opacity:1;}
+
+/* ════════════════════════════ SLIDER */
+.sl-wrap{padding:6px 0 16px;}
+.sl-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--txt3);margin-bottom:18px;}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;
+  background:rgba(255,255,255,.06);border-radius:99px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;
+  width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#9D6FFF,#7B3FF2);
+  cursor:pointer;box-shadow:0 0 0 3px rgba(123,63,242,0.2),0 0 16px rgba(123,63,242,.65);
+  border:2px solid rgba(255,255,255,.2);transition:transform .15s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);}
+.sl-display{text-align:center;padding-top:16px;}
+.sl-num{font-family:'Playfair Display',serif;font-size:62px;font-weight:700;
+  background:linear-gradient(135deg,#C4B5FD 0%,#9D6FFF 50%,#BFA6FF 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-.04em;line-height:1;}
+.sl-caption{font-size:13.5px;color:var(--txt2);margin-top:6px;font-weight:300;}
+
+/* ════════════════════════════ TEXT INPUT */
+.txt-in{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);
+  border-radius:16px;padding:20px 24px;color:var(--txt);
+  font-family:'Playfair Display',serif;font-size:24px;font-weight:400;
+  outline:none;transition:all .24s;text-align:center;letter-spacing:-.01em;}
+.txt-in:focus{border-color:var(--sel-b);background:var(--sel-bg);
+  box-shadow:0 0 0 3px rgba(123,63,242,.12),inset 0 1px 0 rgba(255,255,255,.04);}
+.txt-in::placeholder{color:var(--txt3);font-style:italic;}
+
+/* ════════════════════════════ NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;
+  margin-top:26px;padding-top:18px;border-top:1px solid var(--border3);}
+.btn-back{background:transparent;border:none;color:var(--txt3);cursor:pointer;
+  font-size:13px;font-weight:400;display:flex;align-items:center;gap:5px;padding:8px 0;
+  transition:color .18s;}
+.btn-back:hover{color:var(--txt2);}
+.btn-next{background:linear-gradient(135deg,#3D1A8A 0%,#7B3FF2 50%,#9D6FFF 100%);
+  border:none;border-radius:99px;padding:13px 32px;color:#fff;
+  font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.02em;
+  transition:all .22s;display:flex;align-items:center;gap:7px;
+  box-shadow:0 4px 20px rgba(61,26,138,.4),inset 0 1px 0 rgba(255,255,255,.14);
+  opacity:.3;pointer-events:none;}
+.btn-next.on{opacity:1;pointer-events:all;}
+.btn-next.on:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(61,26,138,.6),inset 0 1px 0 rgba(255,255,255,.18);}
+
+/* ════════════════════════════ WELCOME */
+.wlc-eyebrow{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold-pale);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.wlc-rule{flex:1;height:1px;background:linear-gradient(90deg,rgba(229,184,48,.3),transparent);}
+.wlc-title{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;
+  line-height:1.14;color:var(--txt);margin-bottom:16px;letter-spacing:-.028em;}
+.wlc-title em{font-style:italic;
+  background:linear-gradient(135deg,#E5B830 0%,#C9920A 40%,#F0D080 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.wlc-body{font-size:14.5px;line-height:1.72;color:var(--txt2);margin-bottom:22px;font-weight:300;}
+.testimonial{background:rgba(255,255,255,.022);border:1px solid var(--border2);
+  border-radius:18px;padding:18px 20px;margin-bottom:20px;position:relative;overflow:hidden;}
+.testimonial::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,146,10,0.4),transparent);}
+.test-stars{color:var(--gold-hi);font-size:12px;letter-spacing:1px;margin-bottom:10px;}
+.test-quote{font-size:13.5px;line-height:1.68;color:var(--txt2);font-weight:300;font-style:italic;margin-bottom:14px;}
+.test-quote::before{content:'\201C';font-family:'Playfair Display',serif;font-size:28px;
+  color:var(--gold-pale);line-height:0;vertical-align:-10px;margin-right:3px;}
+.test-author{display:flex;align-items:center;gap:10px;}
+.test-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7B3FF2,#9D6FFF);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.test-name{font-size:12.5px;font-weight:600;color:var(--txt);}
+.test-role{font-size:11px;color:var(--txt3);}
+.sp-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.sp-faces{display:flex;}
+.sp-face{width:26px;height:26px;border-radius:50%;border:2px solid var(--bg2);margin-right:-7px;
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.f1{background:linear-gradient(135deg,#7B3FF2,#9D6FFF);}
+.f2{background:linear-gradient(135deg,#C9920A,#E5B830);}
+.f3{background:linear-gradient(135deg,#0E9F7E,#38C9A7);}
+.f4{background:linear-gradient(135deg,#8B4513,#C8823A);}
+.sp-text{font-size:13px;color:var(--txt2);margin-left:10px;}
+.sp-text strong{color:var(--txt);font-weight:600;}
+.trust-row{display:flex;align-items:center;gap:18px;margin-top:12px;flex-wrap:wrap;}
+.trust-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--txt3);}
+.btn-start{background:linear-gradient(135deg,#3D1A8A 0%,#7B3FF2 40%,#9D6FFF 100%);
+  border:none;border-radius:99px;padding:18px 42px;color:#fff;
+  font-size:15px;font-weight:600;cursor:pointer;transition:all .24s;
+  box-shadow:0 6px 24px rgba(61,26,138,.48),0 0 0 1px rgba(157,111,255,.2),inset 0 1px 0 rgba(255,255,255,.18);
+  width:100%;letter-spacing:.025em;}
+.btn-start:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(61,26,138,.65),0 0 0 1px rgba(157,111,255,.3);}
+.wlc-fine{font-size:11px;color:var(--txt4);text-align:center;margin-top:10px;}
+.progress-hint{display:flex;align-items:center;gap:6px;justify-content:center;
+  font-size:11px;color:var(--txt3);margin-bottom:18px;}
+.hint-dot{width:6px;height:6px;border-radius:50%;background:var(--gold-hi);
+  box-shadow:0 0 6px var(--gold-hi);animation:pulse 2s ease-in-out infinite;}
+
+/* ════════════════════════════ INSIGHT GLASS */
+.ins-glass{background:var(--surf);backdrop-filter:blur(56px) saturate(1.4);
+  -webkit-backdrop-filter:blur(56px) saturate(1.4);
+  border:1px solid var(--border);border-radius:var(--cr);padding:44px 44px 40px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.028),inset 0 1px 0 rgba(255,255,255,.055),
+  0 32px 90px rgba(0,0,0,.75),0 0 64px rgba(123,63,242,.05);
+  position:relative;overflow:hidden;}
+.ins-glass::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,146,10,.6) 30%,rgba(240,208,128,.4) 50%,rgba(201,146,10,.6) 70%,transparent);}
+.ins-tag{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold-hi);margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.ins-title{font-family:'Playfair Display',serif;font-size:31px;font-weight:600;
+  line-height:1.22;color:var(--txt);margin-bottom:12px;letter-spacing:-.022em;}
+.ins-body{font-size:14px;line-height:1.72;color:var(--txt2);margin-bottom:24px;font-weight:300;}
+.ins-body strong{color:var(--txt);font-weight:500;}
+.btn-cont{background:linear-gradient(135deg,#3D1A8A 0%,#7B3FF2 50%,#9D6FFF 100%);
+  border:none;border-radius:99px;padding:14px 38px;color:#fff;
+  font-size:14px;font-weight:600;cursor:pointer;transition:all .22s;letter-spacing:.02em;
+  box-shadow:0 6px 24px rgba(61,26,138,.4),inset 0 1px 0 rgba(255,255,255,.15);}
+.btn-cont:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(61,26,138,.58);}
+
+/* ════════════════════════════ ERA TIMELINE */
+.era-timeline{position:relative;margin-bottom:24px;padding-bottom:4px;}
+.era-track{position:relative;height:3px;background:rgba(255,255,255,.06);border-radius:99px;margin:0 12px;margin-bottom:26px;}
+.era-fill{position:absolute;left:0;top:0;height:100%;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-hi));
+  box-shadow:0 0 10px rgba(201,146,10,.4);}
+.era-points{display:flex;justify-content:space-between;position:relative;z-index:2;}
+.era-pt{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.era-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.1);position:relative;}
+.era-dot.active{background:var(--gold-hi);border-color:var(--gold);box-shadow:0 0 10px rgba(229,184,48,.6);}
+.era-lbl{font-size:9.5px;color:var(--txt3);letter-spacing:.06em;white-space:nowrap;margin-top:-18px;}
+.era-lbl.active{color:var(--gold-pale);}
+
+/* ════════════════════════════ STAT CARDS */
+.stat-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px;}
+.stat-card{background:rgba(255,255,255,.022);border:1px solid var(--border2);border-radius:16px;padding:16px 14px;text-align:center;}
+.stat-num{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;
+  background:linear-gradient(135deg,#C4B5FD,#9D6FFF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;letter-spacing:-.02em;margin-bottom:6px;}
+.stat-lbl{font-size:11px;color:var(--txt3);line-height:1.4;font-weight:400;}
+.stat-src{font-size:9.5px;color:var(--txt4);margin-top:4px;font-style:italic;}
+
+/* ════════════════════════════ BAR CHART */
+.chart-wrap{margin-bottom:26px;}
+.chart-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt3);margin-bottom:6px;}
+.chart-source{font-size:10px;color:var(--txt4);margin-bottom:16px;font-style:italic;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.bar-row-lbl{font-size:11.5px;color:var(--txt3);width:190px;flex-shrink:0;text-align:right;line-height:1.3;}
+.bar-row.hi .bar-row-lbl{color:var(--gold-pale);}
+.bar-track{flex:1;height:5px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;}
+.bar-fill{height:100%;width:0;border-radius:99px;background:rgba(123,63,242,.3);
+  transition:width 1.1s cubic-bezier(.4,0,.2,1);}
+.bar-row.hi .bar-fill{background:linear-gradient(90deg,var(--gold),var(--gold-hi));
+  box-shadow:0 0 10px rgba(201,146,10,.4);}
+.bar-pct{font-size:11.5px;color:var(--txt3);width:34px;flex-shrink:0;font-weight:600;}
+.bar-row.hi .bar-pct{color:var(--gold-pale);}
+
+/* ════════════════════════════ MOMENTUM */
+.mom-wrap{background:var(--surf);backdrop-filter:blur(56px) saturate(1.4);
+  -webkit-backdrop-filter:blur(56px) saturate(1.4);
+  border:1px solid var(--border);border-radius:var(--cr);padding:42px 44px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.028),inset 0 1px 0 rgba(255,255,255,.055),
+  0 32px 90px rgba(0,0,0,.75);position:relative;text-align:center;overflow:hidden;}
+.mom-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--vi) 25%,rgba(220,210,255,.4) 50%,var(--vi) 75%,transparent);}
+.mom-pct{font-family:'Playfair Display',serif;font-size:74px;font-weight:700;
+  background:linear-gradient(135deg,#C4B5FD 0%,#9D6FFF 50%,#BFA6FF 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;letter-spacing:-.04em;margin-bottom:4px;}
+.mom-pct-lbl{font-size:11px;color:var(--txt3);letter-spacing:.14em;text-transform:uppercase;margin-bottom:22px;}
+.mom-rule{width:36px;height:1px;background:var(--border2);margin:0 auto 20px;}
+.mom-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:600;
+  line-height:1.24;color:var(--txt);margin-bottom:11px;letter-spacing:-.02em;}
+.mom-body{font-size:13.5px;line-height:1.72;color:var(--txt2);margin-bottom:24px;
+  font-weight:300;max-width:460px;margin-left:auto;margin-right:auto;}
+.recip-box{background:rgba(123,63,242,.06);border:1px solid rgba(123,63,242,.16);
+  border-radius:16px;padding:16px 20px;margin-bottom:20px;text-align:left;}
+.recip-label{font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--vi-pale);margin-bottom:7px;}
+.recip-text{font-size:13px;line-height:1.64;color:var(--txt2);font-weight:300;}
+.recip-text strong{color:var(--txt);font-weight:500;}
+.loss-box{background:rgba(201,146,10,.04);border:1px solid rgba(201,146,10,.15);
+  border-radius:16px;padding:14px 18px;margin-bottom:20px;text-align:left;}
+.loss-label{font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(229,184,48,.8);margin-bottom:6px;}
+.loss-text{font-size:12.5px;color:rgba(229,200,120,.65);line-height:1.6;font-weight:300;}
+
+/* ════════════════════════════ BUILDING */
+.bld-wrap{background:var(--surf);backdrop-filter:blur(56px) saturate(1.4);
+  -webkit-backdrop-filter:blur(56px) saturate(1.4);
+  border:1px solid var(--border);border-radius:var(--cr);padding:54px 44px;
+  box-shadow:0 32px 90px rgba(0,0,0,.75);position:relative;text-align:center;}
+.bld-ring-outer{width:82px;height:82px;margin:0 auto 28px;position:relative;}
+.bld-ring{width:82px;height:82px;border-radius:50%;
+  border:1.5px solid rgba(123,63,242,.18);border-top-color:var(--vi-hi);
+  animation:spin 1.2s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.bld-ring-inner{position:absolute;inset:12px;border-radius:50%;
+  border:1px solid rgba(201,146,10,.1);border-bottom-color:rgba(229,184,48,.35);
+  animation:spin 2s linear infinite reverse;}
+.bld-gem{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.bld-tag{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--vi-pale);margin-bottom:10px;}
+.bld-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:600;color:var(--txt);margin-bottom:10px;letter-spacing:-.02em;}
+.bld-sub{font-size:13.5px;color:var(--txt2);margin-bottom:28px;font-weight:300;line-height:1.64;}
+.bld-steps{text-align:left;max-width:330px;margin:0 auto;}
+.bld-step{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--txt3);margin-bottom:12px;font-weight:400;}
+.bld-step.done{color:var(--txt2);}
+.bld-step.active{color:var(--vi-pale);}
+.step-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.08);flex-shrink:0;transition:background .4s;}
+.bld-step.done .step-dot{background:var(--gold-hi);box-shadow:0 0 8px rgba(229,184,48,.5);}
+.bld-step.active .step-dot{background:var(--vi-hi);box-shadow:0 0 10px rgba(157,111,255,.8);animation:pulse 1.1s ease-in-out infinite;}
+
+/* ════════════════════════════ RESULTS */
+.res-glass{background:var(--surf);backdrop-filter:blur(56px) saturate(1.4);
+  -webkit-backdrop-filter:blur(56px) saturate(1.4);
+  border:1px solid var(--border);border-radius:var(--cr);padding:38px 40px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.028),inset 0 1px 0 rgba(255,255,255,.055),
+  0 32px 80px rgba(0,0,0,.72);position:relative;overflow:hidden;}
+.res-glass::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,146,10,.6) 25%,rgba(240,208,128,.35) 50%,rgba(201,146,10,.6) 75%,transparent);}
+
+/* Figure reveal */
+.figure-reveal{display:flex;align-items:center;gap:28px;margin-bottom:22px;flex-wrap:wrap;}
+.figure-portrait{flex-shrink:0;width:110px;height:110px;position:relative;}
+.figure-portrait-svg{width:110px;height:110px;}
+.fig-era-badge{display:inline-flex;align-items:center;gap:6px;
+  background:rgba(201,146,10,.1);border:1px solid rgba(201,146,10,.28);
+  border-radius:99px;padding:4px 12px;margin-bottom:8px;
+  font-size:10px;font-weight:600;color:var(--gold-pale);letter-spacing:.08em;}
+.fig-archetype-tag{font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--vi-bright);margin-bottom:6px;}
+.fig-name{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;
+  color:var(--txt);letter-spacing:-.024em;line-height:1.1;margin-bottom:4px;}
+.fig-title{font-size:14px;color:var(--txt2);font-style:italic;font-weight:300;margin-bottom:10px;}
+.fig-quote-block{background:rgba(201,146,10,.04);border-left:2px solid rgba(201,146,10,.4);
+  padding:12px 16px;border-radius:0 12px 12px 0;margin-bottom:16px;}
+.fig-quote{font-family:'Playfair Display',serif;font-size:14px;font-style:italic;
+  color:var(--txt2);line-height:1.62;margin-bottom:4px;}
+.fig-quote-src{font-size:11px;color:var(--txt3);}
+.fig-insight{font-size:13.5px;line-height:1.74;color:var(--txt2);margin-bottom:18px;font-weight:300;}
+.fig-insight strong{color:var(--txt);font-weight:500;}
+.fig-traits{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.fig-trait{background:rgba(123,63,242,.08);border:1px solid rgba(123,63,242,.2);
+  border-radius:99px;padding:5px 13px;font-size:11px;color:var(--vi-pale);font-weight:500;}
+
+/* Profile keys */
+.profile-keys{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.pkey{background:rgba(255,255,255,.022);border:1px solid var(--border2);border-radius:14px;padding:14px;}
+.pkey-label{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt3);margin-bottom:5px;}
+.pkey-val{font-size:13px;color:var(--txt);font-weight:500;line-height:1.35;}
+
+/* Secondary figure */
+.secondary-figure{background:rgba(255,255,255,.016);border:1px solid var(--border2);
+  border-radius:16px;padding:14px 16px;margin-bottom:14px;
+  display:flex;align-items:center;gap:12px;}
+.sec-fig-icon{font-size:22px;flex-shrink:0;}
+.sec-fig-label{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt3);margin-bottom:3px;}
+.sec-fig-name{font-size:14px;font-weight:600;color:var(--txt);}
+.sec-fig-pct{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;
+  background:linear-gradient(135deg,var(--vi-pale),var(--vi-hi));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-left:auto;flex-shrink:0;}
+
+/* Chart panels */
+.res-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+.chart-panel{background:var(--surf);backdrop-filter:blur(56px);-webkit-backdrop-filter:blur(56px);
+  border:1px solid var(--border);border-radius:var(--cr);padding:28px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;}
+.chart-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,146,10,.4),transparent);}
+.cp-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--txt3);margin-bottom:16px;align-self:flex-start;}
+
+/* Modern equivalent panel */
+.modern-panel{background:var(--surf);backdrop-filter:blur(56px);-webkit-backdrop-filter:blur(56px);
+  border:1px solid var(--border);border-radius:var(--cr);padding:28px 32px;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);position:relative;overflow:hidden;margin-top:14px;}
+.modern-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(157,111,255,.5),transparent);}
+.modern-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--vi-bright);margin-bottom:10px;}
+.modern-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--txt);margin-bottom:8px;letter-spacing:-.015em;}
+.modern-body{font-size:13px;line-height:1.72;color:var(--txt2);font-weight:300;}
+.modern-body strong{color:var(--txt);font-weight:500;}
+
+/* Download CTA */
+.dl-panel{background:var(--surf);backdrop-filter:blur(56px);-webkit-backdrop-filter:blur(56px);
+  border:1px solid var(--border);border-radius:var(--cr);padding:32px 36px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);position:relative;overflow:hidden;margin-top:14px;}
+.dl-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,146,10,.4),transparent);}
+.dl-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px;flex-wrap:wrap;}
+.dl-text h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--txt);margin-bottom:6px;}
+.dl-text p{font-size:13px;color:var(--txt2);line-height:1.62;font-weight:300;max-width:300px;}
+.dl-urgency{background:rgba(123,63,242,.07);border:1px solid rgba(123,63,242,.18);
+  border-radius:14px;padding:12px 16px;flex-shrink:0;}
+.dl-urgency-lbl{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--vi-pale);margin-bottom:4px;}
+.dl-urgency-val{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--txt);}
+.store-row{display:flex;gap:12px;flex-wrap:wrap;}
+.store-btn{display:flex;align-items:center;gap:12px;border-radius:16px;padding:14px 22px;transition:all .24s;min-width:176px;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.store-btn.apple-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--txt);}
+.store-btn.apple-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);transform:translateY(-3px);}
+.store-btn.play-btn{background:rgba(123,63,242,.07);border:1px solid rgba(157,111,255,.22);color:var(--txt);}
+.store-btn.play-btn:hover{background:rgba(123,63,242,.12);border-color:rgba(157,111,255,.36);transform:translateY(-3px);}
+.s-icon{flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+.s-sub{font-size:10px;color:var(--txt3);font-weight:400;margin-bottom:2px;}
+.s-name{font-size:14px;font-weight:600;}
+.dl-fine{font-size:11px;color:var(--txt4);margin-top:14px;}
+
+/* ════════════════════════════ CONFETTI */
+.confetti-field{position:fixed;inset:0;pointer-events:none;z-index:99;overflow:hidden;}
+.cp{position:absolute;border-radius:50%;animation:cfall linear forwards;opacity:0;}
+@keyframes cfall{0%{opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+
+/* ════════════════════════════ FOOTER */
+footer{position:relative;z-index:10;padding:24px 40px 30px;text-align:center;border-top:1px solid var(--border3);}
+.footer-links{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;}
+.footer-link{font-size:11.5px;color:var(--txt4);transition:color .18s;}
+.footer-link:hover{color:var(--vi-pale);}
+.footer-sep{width:3px;height:3px;border-radius:50%;background:var(--txt4);}
+.footer-copy{font-size:10.5px;color:var(--txt4);margin-top:8px;}
+
+/* ════════════════════════════ DESKTOP */
+@media(min-width:860px){
+  .hdr{padding:28px 60px 0;}
+  .prog-wrap{padding:18px 60px 0;}
+  .screens{padding:36px 32px 100px;}
+  .card{max-width:624px;padding:52px 56px 48px;}
+  .card-c{max-width:640px;}
+  .wlc-title{font-size:46px;}
+  .q-text{font-size:30px;}
+  .ins-title{font-size:33px;}
+  .fig-name{font-size:40px;}
+  .ins-glass,.mom-wrap{padding:50px 56px 46px;}
+  .bld-wrap{padding:60px 56px 54px;}
+  .res-glass{padding:44px 48px;}
+  .dl-panel{padding:36px 44px;}
+  .store-row{flex-wrap:nowrap;}
+}
+@media(min-width:1100px){
+  .hdr{padding:30px 80px 0;}
+  .prog-wrap{padding:20px 80px 0;}
+  .screens{padding:40px 40px 110px;}
+  .card{max-width:644px;}
+  .card-c{max-width:660px;}
+}
+@media(max-width:680px){
+  .hdr{padding:14px 18px 0;}
+  .prog-wrap{padding:10px 18px 0;}
+  .q-counter{display:none;}
+  .card{padding:26px 20px 22px;}
+  .q-text{font-size:22px;}
+  .wlc-title{font-size:30px;}
+  .res-layout{grid-template-columns:1fr;}
+  .profile-keys{grid-template-columns:1fr;}
+  .dl-top{flex-direction:column;}
+  .store-row{flex-direction:column;}
+  .figure-reveal{flex-direction:column;align-items:flex-start;}
+  .stat-cards{grid-template-columns:1fr;}
+  .ins-glass,.mom-wrap{padding:26px 22px 22px;}
+  footer{padding:20px 24px;}
+  .skel-overlay{padding:26px 20px 22px;}
+}
+@media(max-width:480px){
+  .card{padding:20px 15px 18px;}
+  .q-text{font-size:20px;}
+  .opts{gap:6px;}
+  .opt{padding:12px 14px;font-size:12.5px;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="orb o3"></div><div class="orb o4"></div><div class="orb o5"></div>
+</div>
+<div class="bg-grid"></div>
+<div class="bg-noise"></div>
+<div class="confetti-field" id="confetti"></div>
+
+<div class="app">
+  <div class="hdr">
+    <a class="logo" href="#" onclick="location.reload();return false;">
+      <div class="logo-gem">
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="13,2 22,8 22,18 13,24 4,18 4,8" fill="none" stroke="rgba(157,111,255,0.6)" stroke-width="1.2"/>
+          <polygon points="13,6 19,10 19,16 13,20 7,16 7,10" fill="rgba(123,63,242,0.3)"/>
+          <circle cx="13" cy="13" r="2" fill="rgba(201,146,10,0.9)"/>
+        </svg>
+      </div>
+      <span class="logo-name">Conversly</span>
+    </a>
+    <span class="q-counter" id="qCounter"></span>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:3%"></div></div>
+    <div class="prog-milestones" id="progMs">
+      <span class="prog-ms" data-at="25">Voice</span>
+      <span class="prog-ms" data-at="50">Style</span>
+      <span class="prog-ms" data-at="72">Presence</span>
+      <span class="prog-ms" data-at="100">Archetype</span>
+    </div>
+  </div>
+  <div class="screens" id="screens">
+    <div class="screens-spacer" id="screensSpacer" aria-hidden="true"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a class="footer-link" href="https://conversly.io/" target="_blank" rel="noopener">conversly.io</a>
+    <span class="footer-sep"></span>
+    <a class="footer-link" href="https://apps.apple.com/app/conversly-communication-gym/id6753739129" target="_blank" rel="noopener">App Store</a>
+    <span class="footer-sep"></span>
+    <a class="footer-link" href="https://play.google.com/store/apps/details?id=com.conversly.app" target="_blank" rel="noopener">Google Play</a>
+  </div>
+  <div class="footer-copy">© 2025 Conversly · All rights reserved</div>
+</footer>
+
+<script>
+/* ════════════════════════════ STATE */
+const S = { screen: 0, answers: {} };
+
+/* ════════════════════════════ HISTORICAL FIGURES */
+const FIGURES = {
+  socrates: {
+    name: 'Socrates',
+    era: '470–399 BC · Ancient Athens',
+    title: 'The Philosophical Questioner',
+    icon: '⚗️',
+    portraitBg: ['#1A0A40','#3D1A8A'],
+    portraitSymbol: '⚖️',
+    quote: '"The unexamined life is not worth living."',
+    quoteSource: '— Socrates, at his trial · 399 BC',
+    traits: ['Dialectical Mastery','Intellectual Humility','Strategic Questioning','Patient Precision','Truth-Seeking'],
+    insight: `You communicate the way Socrates shaped an entire civilization — not by imposing answers, but by <strong>engineering questions so precise they force others to discover truth themselves.</strong> You never waste words trying to convince. You create the conditions where conviction becomes inevitable.`,
+    modernEquivalent: 'The executive coach who dismantles $100M assumptions in three questions. The jury lawyer who wins without raising their voice. The mentor who changes careers with a single well-placed "why?"',
+    legendaryMoment: 'His trial defense — condemned to death for his ideas, he chose truth over survival.',
+    strengthNote: 'Your questions land harder than most people\'s statements.',
+    watchOut: 'You can leave people feeling interrogated rather than guided.',
+    colorAccent: '#9D6FFF',
+  },
+  cicero: {
+    name: 'Cicero',
+    era: '106–43 BC · Roman Republic',
+    title: 'The Master Orator',
+    icon: '🏛️',
+    portraitBg: ['#1A0A0A','#8A2A1A'],
+    portraitSymbol: '📜',
+    quote: '"A room without books is like a body without a soul."',
+    quoteSource: '— Marcus Tullius Cicero · 60 BC',
+    traits: ['Rhetorical Architecture','Structural Mastery','Formal Eloquence','Devastating Precision','Historical Command'],
+    insight: `You communicate the way Cicero commanded the Roman Senate — with <strong>structure so flawless that every argument feels inevitable before you've finished speaking.</strong> You build cases like cathedrals: foundation first, then the spire. Your opponents often realize they've lost only after you've already won.`,
+    modernEquivalent: 'The appellate attorney who changes legal precedent. The speechwriter who moves nations. The consultant whose PowerPoint single-handedly shifts board votes.',
+    legendaryMoment: 'The Catilinarian Orations — he exposed a coup in real time from the Senate floor.',
+    strengthNote: 'Your structure makes you devastatingly hard to argue against.',
+    watchOut: 'Your formality can create distance in personal or intimate contexts.',
+    colorAccent: '#E57B3A',
+  },
+  lincoln: {
+    name: 'Abraham Lincoln',
+    era: '1809–1865 · 19th Century America',
+    title: 'The Storyteller President',
+    icon: '🪵',
+    portraitBg: ['#0A1A0A','#1A3A1A'],
+    portraitSymbol: '🎩',
+    quote: '"Give me six hours to chop down a tree and I will spend the first four sharpening the axe."',
+    quoteSource: '— Abraham Lincoln · 1840s',
+    traits: ['Master Storytelling','Moral Clarity','Plain-Spoken Power','Empathetic Precision','Strategic Patience'],
+    insight: `You communicate the way Lincoln held a fractured nation together — through <strong>stories that make the most complex moral questions feel personally felt rather than abstractly argued.</strong> You have an instinctive understanding that people don't change their minds through logic alone. They change when a story makes the truth feel real.`,
+    modernEquivalent: 'The founder who rallies a team through a crisis with one story. The negotiator who finds common ground where everyone else saw a wall. The leader who wins over the room before they say anything technical.',
+    legendaryMoment: 'The Gettysburg Address — 272 words that redefined what America was fighting for.',
+    strengthNote: 'Your stories make people feel what you need them to believe.',
+    watchOut: 'You can take too long to arrive at the point in time-pressured contexts.',
+    colorAccent: '#4A9A4A',
+  },
+  douglass: {
+    name: 'Frederick Douglass',
+    era: '1818–1895 · 19th Century America',
+    title: 'The Moral Crusader',
+    icon: '✊',
+    portraitBg: ['#1A0A0A','#5A1A0A'],
+    portraitSymbol: '🔥',
+    quote: '"Without struggle, there is no progress."',
+    quoteSource: '— Frederick Douglass · 1857',
+    traits: ['Moral Authority','Fierce Clarity','Personal Truth as Power','Unflinching Courage','Transformative Urgency'],
+    insight: `You communicate the way Douglass moved continents with nothing but the undeniable weight of lived truth — <strong>your authority comes not from position or preparation, but from a moral clarity so complete that silence becomes impossible.</strong> You have a rare ability to make the cost of inaction feel more painful than the discomfort of change.`,
+    modernEquivalent: 'The whistleblower who changes industry practice. The activist founder who builds a movement from a keynote. The executive who speaks truth to power when everyone else looks away.',
+    legendaryMoment: '"What to the Slave is the Fourth of July?" — one speech that permanently shifted the abolitionist movement.',
+    strengthNote: 'Your moral authority makes your words impossible to dismiss.',
+    watchOut: 'Your intensity can overwhelm in contexts that call for finesse.',
+    colorAccent: '#E55A2A',
+  },
+  roosevelt_t: {
+    name: 'Theodore Roosevelt',
+    era: '1858–1919 · Early 20th Century',
+    title: 'The Commanding Force',
+    icon: '⚡',
+    portraitBg: ['#1A1000','#4A2800'],
+    portraitSymbol: '🦁',
+    quote: '"Speak softly and carry a big stick; you will go far."',
+    quoteSource: '— Theodore Roosevelt · 1901',
+    traits: ['Kinetic Energy','Commanding Directness','Action-Oriented Authority','Physical Presence','Relentless Conviction'],
+    insight: `You communicate the way Roosevelt led a charge up San Juan Hill — <strong>with such complete commitment and physical conviction that people follow before they consciously decide to.</strong> Your presence precedes your words. When you speak, people feel the room shift. You don't just communicate ideas — you transmit momentum.`,
+    modernEquivalent: 'The CEO who turns around a demoralized company with three sentences. The sports director who changes a locker room\'s entire identity at halftime. The founder who makes investors believe through sheer force of will.',
+    legendaryMoment: 'Delivering a 90-minute speech immediately after being shot in the chest.',
+    strengthNote: 'Your conviction is contagious — people can feel when you mean it.',
+    watchOut: 'You can be so forceful that nuance and listening get lost.',
+    colorAccent: '#D4820A',
+  },
+  churchill: {
+    name: 'Winston Churchill',
+    era: '1874–1965 · 20th Century Britain',
+    title: 'The Defiant Lion',
+    icon: '🦁',
+    portraitBg: ['#0A0A1A','#1A1A4A'],
+    portraitSymbol: '⚔️',
+    quote: '"We shall fight on the beaches. We shall never surrender."',
+    quoteSource: '— Winston Churchill · June 4, 1940',
+    traits: ['Defiant Grandeur','Poetic Gravity','Historical Weight','Wit Under Pressure','Rallying Authority'],
+    insight: `You communicate the way Churchill held civilization together at its darkest hour — with words <strong>so weighted with history and defiance that they actually change what people believe is possible.</strong> You understand instinctively that in crisis moments, the language of survival is what people need — and you deliver it with a poet's precision.`,
+    modernEquivalent: 'The crisis CEO who prevents a collapse with a single investor call. The founder who rallies a team at the moment of maximum doubt. The attorney who delivers a closing argument that reverses what seemed inevitable.',
+    legendaryMoment: '"Their Finest Hour" speech — delivered when most of his cabinet believed Britain should capitulate.',
+    strengthNote: 'You are at your best precisely when the stakes are highest.',
+    watchOut: 'Your gravitas can make everyday communication feel overdramatic.',
+    colorAccent: '#7B7BFF',
+  },
+  eleanor: {
+    name: 'Eleanor Roosevelt',
+    era: '1884–1962 · 20th Century America',
+    title: 'The Quiet Force',
+    icon: '🕊️',
+    portraitBg: ['#0A1A18','#0A3A30'],
+    portraitSymbol: '🌿',
+    quote: '"No one can make you feel inferior without your consent."',
+    quoteSource: '— Eleanor Roosevelt · 1937',
+    traits: ['Principled Warmth','Diplomatic Precision','Empathetic Command','Quiet Authority','Values-Anchored Courage'],
+    insight: `You communicate the way Eleanor Roosevelt redefined what power sounds like — not as dominance or volume, but as <strong>an unwavering moral clarity delivered with such genuine warmth that people can't find a foothold to resist it.</strong> You disarm before you persuade. You're trusted before you've made your case. That trust is your most powerful tool.`,
+    modernEquivalent: 'The HR executive who changes company culture without issuing mandates. The negotiator who gets both sides to feel they won. The manager everyone confides in — and whose asks are never refused.',
+    legendaryMoment: 'Resigned from the DAR publicly over racial discrimination — the quiet act that shook the nation.',
+    strengthNote: 'Your warmth creates the safety that makes persuasion effortless.',
+    watchOut: 'You may be underestimated until the moment you are not — and that gap can cost time.',
+    colorAccent: '#38C9A7',
+  },
+  mlk: {
+    name: 'Martin Luther King Jr.',
+    era: '1929–1968 · 20th Century America',
+    title: 'The Prophetic Voice',
+    icon: '🌟',
+    portraitBg: ['#1A0A00','#4A1A00'],
+    portraitSymbol: '✨',
+    quote: '"Darkness cannot drive out darkness; only light can do that."',
+    quoteSource: '— MLK Jr. · Strength to Love, 1963',
+    traits: ['Prophetic Vision','Rhythmic Mastery','Emotional Architecture','Biblical Depth','Movement-Building Power'],
+    insight: `You communicate the way King made a nation feel the full moral weight of its contradictions — through <strong>language that operates simultaneously as poetry, argument, and spiritual summons.</strong> Your communication doesn't just make a case — it creates an experience. People don't just agree with you; they feel moved by you in a way that persists long after you've stopped speaking.`,
+    modernEquivalent: 'The keynote speaker whose talk becomes a movement. The founder whose mission attracts missionaries, not just employees. The leader who can articulate a vision so clearly that people sacrifice comfort to pursue it.',
+    legendaryMoment: '"I Have a Dream" — improvised the most famous passage after Mahalia Jackson called out "Tell them about the dream."',
+    strengthNote: 'Your words don\'t just persuade — they permanently alter what people believe is possible.',
+    watchOut: 'Everyday conversations can feel anticlimactic against your natural register.',
+    colorAccent: '#FF9A3A',
+  },
+  jfk: {
+    name: 'John F. Kennedy',
+    era: '1917–1963 · 20th Century America',
+    title: 'The Charismatic Idealist',
+    icon: '🌙',
+    portraitBg: ['#0A0A1A','#0A1A3A'],
+    portraitSymbol: '🌐',
+    quote: '"Ask not what your country can do for you — ask what you can do for your country."',
+    quoteSource: '— JFK, Inaugural Address · January 20, 1961',
+    traits: ['Composed Magnetism','Aspirational Precision','Poetic Economy','Effortless Command','Wit as Weaponry'],
+    insight: `You communicate the way Kennedy made the impossible sound not just possible, but obvious — with <strong>a composed magnetism that makes people feel smart for believing in something audacious.</strong> Your genius is in compression: you reduce enormous ideas to phrases so elegant that they become the way people think about a problem forever after. You're not selling. You're revealing what people already wanted to believe.`,
+    modernEquivalent: 'The founder whose vision pitch makes the room feel privileged to invest. The leader who reframes a crisis as an opportunity so naturally that no one questions the pivot. The communicator who is always the most memorable person in the room without ever trying.',
+    legendaryMoment: 'The "We choose to go to the moon" speech — made the absurd feel inevitable.',
+    strengthNote: 'Your composure gives others permission to believe in bigger things.',
+    watchOut: 'Your elegance can make people assume the implementation is as simple as the vision.',
+    colorAccent: '#3A8AE8',
+  },
+  maya: {
+    name: 'Maya Angelou',
+    era: '1928–2014 · 20th Century America',
+    title: 'The Poet of Living Truth',
+    icon: '🦋',
+    portraitBg: ['#1A0A1A','#3A0A3A'],
+    portraitSymbol: '✍️',
+    quote: '"People will forget what you said. They will never forget how you made them feel."',
+    quoteSource: '— Maya Angelou',
+    traits: ['Vulnerable Authority','Poetic Precision','Emotional Truth-Telling','Voice as Instrument','Wisdom Through Story'],
+    insight: `You communicate the way Maya Angelou made every person in a room feel personally seen — through <strong>a willingness to be completely truthful that gives others permission to be truthful too.</strong> Your vulnerability is not weakness. It's your most sophisticated tool. You make authenticity contagious, and that is rarer and more powerful than almost any other communication gift.`,
+    modernEquivalent: 'The speaker who brings an audience to silence. The therapist who changes a life in one session. The founder who builds a community of fiercely loyal believers simply by being willing to be completely real.',
+    legendaryMoment: 'Her 1993 Inaugural Poem — she said "a rock, a river, a tree" and a nation stopped.',
+    strengthNote: 'Your authenticity disarms people in ways logic never could.',
+    watchOut: 'In transactional or high-urgency contexts, your depth can feel mismatched.',
+    colorAccent: '#C47BC4',
+  },
+  jobs: {
+    name: 'Steve Jobs',
+    era: '1955–2011 · Late 20th / Early 21st Century',
+    title: 'The Reality Distorter',
+    icon: '◼️',
+    portraitBg: ['#080808','#1A1A1A'],
+    portraitSymbol: '⬡',
+    quote: '"The people who are crazy enough to think they can change the world are the ones who do."',
+    quoteSource: '— Apple "Think Different" campaign · 1997',
+    traits: ['Theatrical Minimalism','Narrative Architecture','Reality Distortion','Simplicity as Power','Visionary Conviction'],
+    insight: `You communicate the way Jobs made a room believe a product launch was a cosmic event — through <strong>a ruthless commitment to simplicity that makes the complex feel inevitable, and the ordinary feel revolutionary.</strong> You strip everything that isn't essential, then present what remains with such conviction that people don't just want what you're offering — they feel they've been waiting for it their entire lives.`,
+    modernEquivalent: 'The product founder who makes investors believe a demo is the future. The presenter who says three words and changes the conversation forever. The brand builder whose vision is so clear it becomes culture.',
+    legendaryMoment: '"One more thing…" — he made a single phrase into the most anticipated moment in technology.',
+    strengthNote: 'You make the complex feel inevitable and the audacious feel obvious.',
+    watchOut: 'Your demand for precision can feel alienating to those who think in abundance rather than reduction.',
+    colorAccent: '#C4C4C4',
+  },
+  obama: {
+    name: 'Barack Obama',
+    era: '1961 – Present · 21st Century',
+    title: 'The Measured Idealist',
+    icon: '🌐',
+    portraitBg: ['#000A1A','#001A3A'],
+    portraitSymbol: '🌊',
+    quote: '"Change will not come if we wait for some other person or some other time."',
+    quoteSource: '— Barack Obama · 2008',
+    traits: ['Logic & Emotion Fusion','Deliberate Cadence','Bridge-Building','Constitutional Clarity','Aspirational Realism'],
+    insight: `You communicate the way Obama made people who disagreed with each other feel understood simultaneously — through <strong>a synthesis of intellectual rigor and emotional access that makes even complex policy feel personally relevant.</strong> You instinctively build bridges between what is and what could be. You don't just inspire — you make inspiration feel earned and credible at the same time.`,
+    modernEquivalent: 'The leader who unifies a divided board. The communicator who can address any audience — technical or emotional — without losing either. The negotiator who finds the third option when everyone else only saw two.',
+    legendaryMoment: 'The 2004 DNC Keynote — an unknown state senator who spoke for 17 minutes and changed the course of American politics.',
+    strengthNote: 'You make even skeptics feel heard — and that\'s how you win them.',
+    watchOut: 'Your measured approach can frustrate those who want faster, sharper answers.',
+    colorAccent: '#3A82E8',
+  },
+  oprah: {
+    name: 'Oprah Winfrey',
+    era: '1954 – Present · Late 20th / 21st Century',
+    title: 'The Heart Connector',
+    icon: '💫',
+    portraitBg: ['#1A0808','#3A0A0A'],
+    portraitSymbol: '❤️',
+    quote: '"The biggest adventure you can take is to live the life of your dreams."',
+    quoteSource: '— Oprah Winfrey',
+    traits: ['Radical Empathy','Intimate Authority','Story as Bridge','Emotional Intelligence','Authentic Magnetism'],
+    insight: `You communicate the way Oprah made every guest — from world leaders to ordinary people — feel like the most important person in the conversation — through <strong>a listening so complete and a presence so genuine that people reveal things to you they've never told anyone else.</strong> Your superpower isn't your words. It's what you make people feel while you're saying them.`,
+    modernEquivalent: 'The leader whose team would run through walls. The salesperson who closes by making people feel completely understood. The founder whose community would follow them anywhere because they always feel seen.',
+    legendaryMoment: 'The 2018 Golden Globes speech — standing ovation, entire news cycle, a presidential conversation began.',
+    strengthNote: 'You create belonging — the rarest and most powerful communication gift.',
+    watchOut: 'High-stakes logical debate may feel less natural than emotional resonance.',
+    colorAccent: '#E87B3A',
+  },
+  cleopatra: {
+    name: 'Cleopatra VII',
+    era: '69–30 BC · Ancient Egypt',
+    title: 'The Intimate Strategist',
+    icon: '🐍',
+    portraitBg: ['#0A0A00','#2A1A00'],
+    portraitSymbol: '👁️',
+    quote: '"I will not be triumphed over."',
+    quoteSource: '— Cleopatra VII · 30 BC',
+    traits: ['Multilingual Mastery','Strategic Intimacy','One-on-One Dominance','Cultural Intelligence','Calculated Charisma'],
+    insight: `You communicate the way Cleopatra made Julius Caesar and Mark Antony — the two most powerful men in the world — change the course of history through the sheer force of a single meeting — through <strong>an intimate, hyper-personalized mastery that makes every individual feel they are the only person in the world that matters to you.</strong> You read people the way others read books. Your real genius isn't in what you say — it's in what you know about who you're saying it to before you begin.`,
+    modernEquivalent: 'The negotiator who closes impossible deals in private rooms. The executive who builds a loyalty network that outlasts every institutional challenge. The founder who wins over the most resistant stakeholder through a single dinner.',
+    legendaryMoment: 'Met Caesar rolled in a carpet — the most audacious entrance in political history.',
+    strengthNote: 'You make people feel uniquely understood — and that\'s an almost unfair advantage.',
+    watchOut: 'Large audiences and broadcast communication can dilute what you do best.',
+    colorAccent: '#D4A017',
+  },
+  napoleon: {
+    name: 'Napoléon Bonaparte',
+    era: '1769–1821 · Early 19th Century',
+    title: 'The Commander\'s Voice',
+    icon: '🦅',
+    portraitBg: ['#0A0808','#1A0A08'],
+    portraitSymbol: '⚔️',
+    quote: '"Impossible is a word found only in the dictionary of fools."',
+    quoteSource: '— Napoléon Bonaparte · c. 1800',
+    traits: ['Strategic Brevity','Command Presence','Direct Authority','Motivational Clarity','Battle-Tested Concision'],
+    insight: `You communicate the way Napoleon turned demoralized troops into the greatest fighting force of their era — through <strong>language so direct and so charged with certainty that it doesn't just communicate a plan, it makes the plan feel already accomplished.</strong> You have zero patience for ambiguity. You believe the fastest path from idea to execution is a sentence clear enough to act on immediately — and you deliver it.`,
+    modernEquivalent: 'The turnaround CEO who stops a bleeding company in 90 days. The military founder who makes the impossible feel like the only rational option. The exec whose memos are always the clearest thing anyone reads that week.',
+    legendaryMoment: 'The "Little Corporal" speeches — he spoke directly to soldiers, not armies, and made individuals feel personally chosen.',
+    strengthNote: 'Your directness eliminates confusion and creates immediate momentum.',
+    watchOut: 'Nuance, empathy, and listening can be casualties of your clarity.',
+    colorAccent: '#A05A20',
+  },
+};
+
+/* ════════════════════════════ SCREENS DATA */
+const SCREENS = [
+
+/* 0 — WELCOME */
+{ id:'welcome', type:'welcome' },
+
+/* Q1 */
+{ id:'q1', type:'q', qNum:1, total:22, tag:'Your Natural Instinct',
+  text:'When you walk into a high-stakes conversation, your first instinct is…',
+  sub:'This single impulse reveals more about your communication archetype than almost anything else.',
+  opts:[
+    {lbl:'Ask the question that reframes everything', val:'v1', pts:{socrates:4,obama:2,jobs:1}},
+    {lbl:'Inspire them to believe in something larger than the room', val:'v2', pts:{mlk:4,jfk:3,churchill:2,roosevelt_t:1}},
+    {lbl:'Establish credibility and command the space immediately', val:'v3', pts:{cicero:4,napoleon:3,roosevelt_t:2}},
+    {lbl:'Make them feel deeply, personally understood', val:'v4', pts:{oprah:4,eleanor:3,maya:2,cleopatra:2}},
+    {lbl:'Present a vision so clear it makes alternatives feel inferior', val:'v5', pts:{jobs:4,jfk:2,lincoln:2,douglass:1}},
+  ]},
+
+/* Q2 */
+{ id:'q2', type:'q', qNum:2, total:22, tag:'Your Primary Weapon',
+  text:'In any debate, the thing you reach for most naturally is…',
+  sub:'Your dominant tool reveals which historical tradition shaped your instincts.',
+  opts:[
+    {lbl:'A perfectly structured argument with no logical gaps', val:'v1', pts:{cicero:4,obama:3,lincoln:2}},
+    {lbl:'A story that makes the truth emotionally unavoidable', val:'v2', pts:{lincoln:4,mlk:3,oprah:2,maya:2}},
+    {lbl:'A question so precise it dismantles the other position', val:'v3', pts:{socrates:4,jfk:2,obama:2}},
+    {lbl:'The moral weight of what is simply right', val:'v4', pts:{douglass:4,eleanor:3,mlk:2}},
+    {lbl:'A single sentence so clear it ends the argument', val:'v5', pts:{napoleon:4,jobs:3,roosevelt_t:2,jfk:1}},
+    {lbl:'Reading the individual and giving them exactly what they need to hear', val:'v6', pts:{cleopatra:4,oprah:3,eleanor:2}},
+  ]},
+
+/* Q3 */
+{ id:'q3', type:'q', qNum:3, total:22, tag:'Silence & Space',
+  text:'Your relationship with silence in a conversation is…',
+  sub:'How you use the spaces between words is one of the most revealing communication signals.',
+  opts:[
+    {lbl:'A power tool — I let silence work harder than most people let words', val:'v1', pts:{socrates:3,napoleon:3,jfk:2,jobs:2}},
+    {lbl:'It makes me nervous — I tend to fill it quickly', val:'v2', pts:{douglass:2,roosevelt_t:2,mlk:1}},
+    {lbl:'I use it for dramatic effect — the pause before the point', val:'v3', pts:{mlk:3,churchill:3,cicero:2}},
+    {lbl:'I sit in it comfortably — it shows I\'m genuinely listening', val:'v4', pts:{eleanor:4,oprah:4,maya:3,cleopatra:2}},
+    {lbl:'I use it strategically — I know exactly when a pause will shift power', val:'v5', pts:{cleopatra:3,napoleon:3,jfk:2,jobs:2}},
+  ]},
+
+/* Q4 */
+{ id:'q4', type:'q', qNum:4, total:22, tag:'Your Emotional Register',
+  text:'When emotion enters a difficult conversation, you typically…',
+  sub:'Your emotional instinct in high-stakes moments is a defining trait of your archetype.',
+  opts:[
+    {lbl:'Use it deliberately — emotion directed strategically is the most powerful force', val:'v1', pts:{mlk:4,douglass:3,oprah:2,maya:2}},
+    {lbl:'Regulate it precisely — I feel it fully but channel it into measured delivery', val:'v2', pts:{obama:4,eleanor:3,lincoln:3,jfk:2}},
+    {lbl:'Keep it contained — I prefer logic to remain dominant', val:'v3', pts:{cicero:4,socrates:4,napoleon:3}},
+    {lbl:'Let it be fully visible — authenticity requires real feeling', val:'v4', pts:{maya:4,oprah:3,douglass:2}},
+    {lbl:'Rise with the moment — my best communication happens at peak intensity', val:'v5', pts:{roosevelt_t:4,churchill:4,mlk:2}},
+  ]},
+
+/* Q5 */
+{ id:'q5', type:'q', qNum:5, total:22, tag:'Your Audience',
+  text:'Where you are genuinely at your best communicating…',
+  sub:'Every archetype has a native environment where their power fully activates.',
+  opts:[
+    {lbl:'One-on-one — I am most powerful in the intimate conversation', val:'v1', pts:{cleopatra:4,socrates:3,oprah:3,eleanor:2}},
+    {lbl:'Small groups — I thrive in the calibrated room', val:'v2', pts:{obama:3,lincoln:3,eleanor:2,jfk:2}},
+    {lbl:'Large audiences — I find my full voice when the stakes and scale are highest', val:'v3', pts:{mlk:4,churchill:4,cicero:3,roosevelt_t:3,jfk:2}},
+    {lbl:'In writing — my precision is truest when I control every word', val:'v4', pts:{lincoln:3,cicero:3,jobs:2,napoleon:2}},
+    {lbl:'Any context — I adapt my register completely to the situation', val:'v5', pts:{cleopatra:3,obama:3,eleanor:2,jfk:2}},
+  ]},
+
+/* INSIGHT 1 */
+{ id:'insight1', type:'insight1', iPct:24 },
+
+/* Q6 */
+{ id:'q6', type:'q', qNum:6, total:22, tag:'Handling Opposition',
+  text:'When someone directly challenges your position, your first move is…',
+  sub:'Your response to challenge reveals whether you communicate from strength or from strategy.',
+  opts:[
+    {lbl:'Turn their challenge into a question that reveals its own weakness', val:'v1', pts:{socrates:4,jfk:2,obama:2}},
+    {lbl:'Raise the moral stakes — make the challenge feel like it misses a larger truth', val:'v2', pts:{douglass:4,mlk:3,eleanor:2}},
+    {lbl:'Hold the ground with doubled conviction and greater volume', val:'v3', pts:{roosevelt_t:4,churchill:3,napoleon:3}},
+    {lbl:'Find the precise point of agreement, then anchor everything to it', val:'v4', pts:{lincoln:4,obama:3,eleanor:2}},
+    {lbl:'Make the challenger look small by making the vision look enormous', val:'v5', pts:{jobs:3,jfk:3,mlk:2}},
+    {lbl:'Read what the challenger actually needs and give them that instead', val:'v6', pts:{cleopatra:4,oprah:3,maya:2}},
+  ]},
+
+/* Q7 */
+{ id:'q7', type:'q', qNum:7, total:22, tag:'Your Tempo',
+  text:'The natural pace of your speech under pressure is…',
+  sub:'Pacing is a fingerprint — and it maps directly to historical communicator archetypes.',
+  opts:[
+    {lbl:'Slow and deliberate — I use deceleration to increase weight', val:'v1', pts:{lincoln:3,socrates:3,obama:3,mlk:2,maya:2}},
+    {lbl:'Fast and energetic — my urgency is contagious and I know it', val:'v2', pts:{roosevelt_t:4,douglass:3,napoleon:2}},
+    {lbl:'Measured with dramatic variation — I control tempo like a composer', val:'v3', pts:{mlk:4,churchill:3,jfk:3,cicero:2}},
+    {lbl:'Crisp and economical — I say it once, clearly, and trust it lands', val:'v4', pts:{napoleon:4,jobs:4,jfk:2}},
+    {lbl:'Conversational and adaptive — I match whoever I\'m speaking with', val:'v5', pts:{oprah:4,cleopatra:3,eleanor:3}},
+  ]},
+
+/* Q8 */
+{ id:'q8', type:'q', qNum:8, total:22, tag:'Preparation vs. Instinct',
+  text:'Before a high-stakes conversation, you rely primarily on…',
+  sub:'The preparation style of great communicators tells us which part of their intelligence they trust most.',
+  opts:[
+    {lbl:'Exhaustive preparation — I have thought of every counterargument before I enter', val:'v1', pts:{cicero:4,obama:3,lincoln:2,napoleon:2}},
+    {lbl:'Deep structural prep, but I trust the moment to supply the words', val:'v2', pts:{mlk:3,churchill:3,jfk:3,obama:2}},
+    {lbl:'Research on the individual or audience — I adapt everything in real time', val:'v3', pts:{cleopatra:4,oprah:3,eleanor:2}},
+    {lbl:'Pure instinct — I perform best when I\'m free, not rehearsed', val:'v4', pts:{roosevelt_t:3,douglass:3,maya:2,oprah:2}},
+    {lbl:'I reduce everything to its essential core — clarity is my preparation', val:'v5', pts:{jobs:4,napoleon:3,jfk:2}},
+  ]},
+
+/* Q9 */
+{ id:'q9', type:'q', qNum:9, total:22, tag:'What You\'re Protecting',
+  text:'Underneath every important thing you communicate, what you\'re really protecting is…',
+  sub:'The deepest value underneath your communication style reveals your true archetype anchor.',
+  opts:[
+    {lbl:'Truth — even when the truth is unwelcome or costs me', val:'v1', pts:{socrates:4,douglass:3,eleanor:2,maya:2}},
+    {lbl:'A vision of what is possible — I\'m communicating on behalf of the future', val:'v2', pts:{mlk:4,jfk:3,jobs:3,obama:2}},
+    {lbl:'Respect — from others, and for the quality of the ideas being exchanged', val:'v3', pts:{cicero:3,lincoln:2,obama:2,eleanor:2}},
+    {lbl:'The relationship — communication that damages connection isn\'t worth winning', val:'v4', pts:{oprah:4,eleanor:3,maya:3,cleopatra:2}},
+    {lbl:'The outcome — I communicate to win and to produce results, nothing else', val:'v5', pts:{napoleon:4,roosevelt_t:3,cleopatra:2,cicero:2}},
+  ]},
+
+/* INSIGHT 2 */
+{ id:'insight2', type:'insight2', iPct:50 },
+
+/* Q10 */
+{ id:'q10', type:'q', qNum:10, total:22, tag:'Storytelling Instinct',
+  text:'When you tell a story, the thing people consistently notice most is…',
+  sub:'Storytelling style is one of the most precise archetype indicators.',
+  opts:[
+    {lbl:'The structure — it feels inevitable, like it could only end that way', val:'v1', pts:{cicero:3,lincoln:3,obama:2}},
+    {lbl:'The moral weight — they feel the stakes, not just hear about them', val:'v2', pts:{mlk:4,douglass:4,maya:3}},
+    {lbl:'The simplicity — I strip it down until only the essential truth remains', val:'v3', pts:{jobs:4,napoleon:3,jfk:2}},
+    {lbl:'The humanity — they feel they\'re living it, not hearing about it', val:'v4', pts:{lincoln:4,oprah:4,maya:3,eleanor:2}},
+    {lbl:'The detail about the person — I make them feel it was told specifically for them', val:'v5', pts:{cleopatra:4,oprah:3,eleanor:2}},
+    {lbl:'The sweep — they feel history moving through the story', val:'v6', pts:{churchill:4,mlk:3,cicero:3,douglass:2}},
+  ]},
+
+/* Q11 */
+{ id:'q11', type:'q', qNum:11, total:22, tag:'Humor & Wit',
+  text:'How does humor show up in your communication?',
+  sub:'A communicator\'s relationship with wit is a surprisingly precise archetype signal.',
+  opts:[
+    {lbl:'Precisely — I deploy a single dry observation that changes the room\'s entire chemistry', val:'v1', pts:{socrates:3,jfk:3,jobs:2,lincoln:2}},
+    {lbl:'Warmly — humor makes people feel safe, and safe people are open people', val:'v2', pts:{oprah:3,lincoln:3,eleanor:3,obama:2}},
+    {lbl:'Unexpectedly — I use wit to disarm in moments of maximum tension', val:'v3', pts:{churchill:4,jfk:3,lincoln:2,socrates:2}},
+    {lbl:'Rarely — I tend to communicate with more gravity than lightness', val:'v4', pts:{mlk:2,douglass:2,napoleon:2,cicero:2,churchill:1}},
+    {lbl:'Spontaneously — I find genuine delight in the moment and let it show', val:'v5', pts:{oprah:3,maya:3,roosevelt_t:2,eleanor:2}},
+  ]},
+
+/* Q12 */
+{ id:'q12', type:'q', qNum:12, total:22, tag:'Your Register',
+  text:'Naturally, your language tends toward…',
+  sub:'The formality and texture of your natural language maps directly to specific historical figures.',
+  opts:[
+    {lbl:'Formal, precise, and architecturally structured — every word earned', val:'v1', pts:{cicero:4,churchill:3,obama:2}},
+    {lbl:'Poetic, rhythmic, and emotionally resonant — language as music', val:'v2', pts:{mlk:4,maya:4,douglass:2,churchill:2}},
+    {lbl:'Plain, direct, and concrete — I trust simple words to carry great weight', val:'v3', pts:{lincoln:4,napoleon:3,jobs:3,roosevelt_t:2}},
+    {lbl:'Conversational and adaptive — I sound like whoever I\'m with', val:'v4', pts:{oprah:4,cleopatra:3,eleanor:3,obama:2}},
+    {lbl:'Compressed and visionary — I create phrases that live long after the conversation', val:'v5', pts:{jobs:4,jfk:4,napoleon:2,churchill:2}},
+  ]},
+
+/* MOMENTUM 1 */
+{ id:'mom1', type:'momentum', pct:60,
+  title:"Your archetype is becoming clear.",
+  body:"The pattern in your answers is narrowing toward a specific historical voice — one shaped by how the greatest communicators across 2,500 years of human history actually thought, spoke, and moved people. The final section unlocks your full profile.",
+  recipLabel:'What separates elite communicators across every era',
+  recipText:"<strong>Every great communicator in history</strong> had one thing in common: they understood who they were communicating AS — not just what they were communicating. Your archetype is the master key to your full potential.",
+  lossText:"The communicators who plateau are those who keep borrowing other people's styles. Knowing your true archetype means you stop copying and start amplifying what was always yours.",
+  showStats:true },
+
+/* Q13 */
+{ id:'q13', type:'q', qNum:13, total:22, tag:'Your Closing Move',
+  text:'At the end of a high-stakes conversation, your signature move is…',
+  sub:'How you close reveals whether you\'re a closer, a planter, a builder, or a linker.',
+  opts:[
+    {lbl:'A question that keeps them thinking long after I\'m gone', val:'v1', pts:{socrates:4,obama:2,maya:2}},
+    {lbl:'A single phrase that compresses the entire argument into something unforgettable', val:'v2', pts:{jobs:4,jfk:4,napoleon:3,churchill:2}},
+    {lbl:'An image or story that makes the conclusion feel inevitable', val:'v3', pts:{lincoln:4,mlk:3,oprah:2,maya:2}},
+    {lbl:'A direct call to action that leaves no ambiguity about what happens next', val:'v4', pts:{napoleon:4,roosevelt_t:4,douglass:3}},
+    {lbl:'Making them feel so understood they naturally move toward what I need', val:'v5', pts:{cleopatra:4,oprah:3,eleanor:3}},
+    {lbl:'Raising the moral stakes so saying no feels like a small choice', val:'v6', pts:{douglass:3,mlk:3,eleanor:2,churchill:2}},
+  ]},
+
+/* Q14 */
+{ id:'q14', type:'q', qNum:14, total:22, tag:'Your Physical Presence',
+  text:'When you speak, your body communicates…',
+  sub:'Nonverbal communication style is deeply tied to historical archetypes.',
+  opts:[
+    {lbl:'Authority — I hold space as naturally as breathing', val:'v1', pts:{napoleon:4,roosevelt_t:4,churchill:3,jfk:2}},
+    {lbl:'Warmth — I make people physically lean in', val:'v2', pts:{oprah:4,eleanor:3,maya:3,lincoln:2}},
+    {lbl:'Stillness — my composure makes everything I say feel more weighted', val:'v3', pts:{socrates:3,obama:3,jfk:3,cleopatra:3}},
+    {lbl:'Energy — my physicality is contagious and I use it intentionally', val:'v4', pts:{roosevelt_t:3,mlk:3,douglass:2}},
+    {lbl:'Precision — I move and gesture exactly as much as the moment requires, never more', val:'v5', pts:{jobs:3,napoleon:3,cicero:3,obama:2}},
+  ]},
+
+/* Q15 */
+{ id:'q15', type:'q', qNum:15, total:22, tag:'Vision vs. Execution',
+  text:'When you communicate, you are primarily painting…',
+  sub:'The vision-to-execution ratio in your communication is a core archetype marker.',
+  opts:[
+    {lbl:'A future so vivid and specific that people feel they\'re already living in it', val:'v1', pts:{mlk:4,jobs:4,jfk:3,obama:2}},
+    {lbl:'A moral argument so clear that inaction becomes the uncomfortable choice', val:'v2', pts:{douglass:4,eleanor:3,mlk:2,lincoln:2}},
+    {lbl:'A precise plan so complete that execution feels inevitable', val:'v3', pts:{napoleon:4,cicero:3,obama:2}},
+    {lbl:'A story so real that the lesson lives in people permanently', val:'v4', pts:{lincoln:4,oprah:3,maya:3,mlk:2}},
+    {lbl:'A moment of connection so complete that trust becomes the foundation for everything else', val:'v5', pts:{cleopatra:4,oprah:3,eleanor:3,maya:2}},
+  ]},
+
+/* MOMENTUM 2 */
+{ id:'mom2', type:'momentum', pct:84,
+  title:"Almost there. This is the most precise section.",
+  body:"The final questions calibrate your archetype with a precision that separates a general match from an exact one. You are in the top 11% of completions. Three questions stand between you and your complete historical communicator profile.",
+  recipLabel:'The rarest communication insight',
+  recipText:"Most people never find their <strong>true communication archetype</strong>. They spend careers borrowing styles that don't fit — and wondering why they can't reach full power. You are about to find yours.",
+  lossText:"Stopping now gives you only a partial picture. The last three questions are the ones that separate who you generally are from who you specifically are. See it through.",
+  showStats:false },
+
+/* Q16 */
+{ id:'q16', type:'q', qNum:16, total:22, tag:'What People Feel',
+  text:'The consistent thing people say they feel after talking to you is…',
+  sub:'The emotional residue you leave behind is the truest measure of your communication archetype.',
+  opts:[
+    {lbl:'Challenged — I changed how they think about something', val:'v1', pts:{socrates:4,jobs:3,obama:2,jfk:2}},
+    {lbl:'Moved — they felt something shift at a level below logic', val:'v2', pts:{mlk:4,maya:4,oprah:3,douglass:2}},
+    {lbl:'Inspired — they left believing something previously impossible was now inevitable', val:'v3', pts:{jfk:4,mlk:3,churchill:3,jobs:2}},
+    {lbl:'Understood — they felt genuinely seen in a way they rarely experience', val:'v4', pts:{oprah:4,eleanor:4,maya:3,cleopatra:3}},
+    {lbl:'Clear — I removed confusion and gave them something they can act on immediately', val:'v5', pts:{napoleon:4,jobs:3,lincoln:3,roosevelt_t:2}},
+    {lbl:'Respected — they felt they were in the presence of someone with genuine authority', val:'v6', pts:{cicero:4,churchill:3,obama:2,cleopatra:2}},
+  ]},
+
+/* Q17 */
+{ id:'q17', type:'q', qNum:17, total:22, tag:'Your Greatest Strength',
+  text:'Your most distinctive communication gift — the thing no one does quite the way you do — is…',
+  sub:'This is the dimension where your archetype reaches its full expression.',
+  opts:[
+    {lbl:'The question that reframes the entire conversation', val:'v1', pts:{socrates:5,obama:2,jfk:2}},
+    {lbl:'The story that makes the truth feel lived rather than argued', val:'v2', pts:{lincoln:5,mlk:3,oprah:3,maya:3}},
+    {lbl:'The phrase so perfectly constructed it lives in memory forever', val:'v3', pts:{jfk:5,jobs:4,churchill:3,napoleon:3}},
+    {lbl:'The presence that makes people feel the room has been calibrated around them', val:'v4', pts:{cleopatra:5,oprah:4,eleanor:3}},
+    {lbl:'The moral clarity that makes the right path impossible to unsee', val:'v5', pts:{douglass:5,mlk:3,eleanor:3,lincoln:2}},
+    {lbl:'The conviction that transfers itself — they believe because I believe so completely', val:'v6', pts:{roosevelt_t:4,churchill:4,mlk:3,jobs:2,napoleon:2}},
+  ]},
+
+/* Q18 */
+{ id:'q18', type:'q', qNum:18, total:22, tag:'Your Communication Legacy',
+  text:'If your communication left a lasting mark, it would be…',
+  sub:'Your vision for your communication legacy is the final and most precise archetype signal.',
+  opts:[
+    {lbl:'A method of thinking — a way of questioning that survives me', val:'v1', pts:{socrates:5,obama:2}},
+    {lbl:'A body of work — speeches, writing, arguments that outlast my lifetime', val:'v2', pts:{cicero:4,lincoln:4,maya:3,churchill:3,mlk:2}},
+    {lbl:'A movement — people whose lives changed because of what I set in motion', val:'v3', pts:{mlk:5,douglass:4,jfk:3,obama:2,eleanor:3}},
+    {lbl:'A standard — the way an industry, a company, or a culture communicates after me', val:'v4', pts:{jobs:5,napoleon:3,cicero:2}},
+    {lbl:'A memory — every person I ever spoke with truly felt they mattered', val:'v5', pts:{oprah:5,eleanor:4,maya:4,cleopatra:3}},
+    {lbl:'A turning point — history reads differently because of what I said at the right moment', val:'v6', pts:{churchill:5,jfk:4,lincoln:3,douglass:3,roosevelt_t:3}},
+  ]},
+
+/* WORD */
+{ id:'q19', type:'word', qNum:19, total:22, tag:'Your Final Signal', key:'one_word',
+  text:'In one word — what do you most want to leave people feeling after every conversation?',
+  sub:'This final word becomes the north star of your historical communicator profile.',
+  placeholder:'e.g. Moved, Certain, Seen, Ignited…'
+},
+
+/* BUILDING */
+{ id:'building', type:'building' },
+
+/* RESULTS */
+{ id:'results', type:'results' }
+];
+
+/* ════════════════════════════ HELPERS */
+function pct(idx) {
+  const s = SCREENS[idx];
+  if (s.type === 'welcome') return 3;
+  if (s.type === 'results') return 100;
+  if (s.type === 'building') return 97;
+  if (s.type === 'momentum') return s.pct;
+  if (s.type === 'insight1') return s.iPct;
+  if (s.type === 'insight2') return s.iPct;
+  if (s.qNum) return Math.round(s.qNum / 22 * 100);
+  return 0;
+}
+function qLabel(idx) { const s = SCREENS[idx]; return s.qNum ? `Question ${s.qNum} of 22` : ''; }
+function svgCheck() { return `<svg class="chk" viewBox="0 0 8 8" fill="none"><path d="M1 4l2.3 2.3L7 1.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+function svgR() { return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+function svgL() { return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7H3M6 10L3 7l3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+function svgShield() { return `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 2L2.5 4v3C2.5 9.5 4.2 11.5 6.5 12c2.3-.5 4-2.5 4-5V4L6.5 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>`; }
+function svgClock() { return `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 4v2.5l1.8 1.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`; }
+function svgLock() { return `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1.5" y="5.5" width="10" height="7" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 5.5V4a2.5 2.5 0 015 0v1.5" stroke="currentColor" stroke-width="1.2"/></svg>`; }
+
+/* ════════════════════════════ SKELETON */
+function skelInner(type) {
+  if (type === 'welcome') return `<div class="skel-line" style="height:10px;width:160px;margin-bottom:20px;"></div>
+    <div class="skel-line" style="height:38px;width:88%;margin-bottom:8px;"></div>
+    <div class="skel-line" style="height:34px;width:72%;margin-bottom:8px;"></div>
+    <div class="skel-line" style="height:34px;width:60%;margin-bottom:22px;"></div>
+    <div class="skel-line" style="height:90px;border-radius:18px;margin-bottom:18px;"></div>
+    <div class="skel-line" style="height:52px;border-radius:99px;width:100%;"></div>`;
+  if (type === 'insight') return `<div class="skel-line sk-tag"></div>
+    <div class="skel-line sk-h1"></div><div class="skel-line sk-h2"></div>
+    <div class="skel-line sk-sub1"></div><div class="skel-line sk-sub2"></div>
+    <div style="margin-top:20px">${[72,64,58,52,46,40].map(w=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div class="skel-line" style="height:12px;width:${w}%;flex-shrink:0;margin:0;"></div></div>`).join('')}</div>`;
+  if (type === 'momentum') return `<div style="text-align:center">
+    <div class="skel-line" style="height:68px;width:120px;margin:0 auto 8px;border-radius:12px;"></div>
+    <div class="skel-line" style="height:10px;width:100px;margin:0 auto 28px;border-radius:99px;"></div>
+    <div class="skel-line" style="height:24px;width:80%;margin:0 auto 10px;border-radius:8px;"></div>
+    <div class="skel-line" style="height:18px;width:60%;margin:0 auto 24px;border-radius:8px;"></div>
+    <div class="skel-line" style="height:80px;border-radius:16px;width:100%;margin-bottom:14px;"></div>
+    <div class="skel-line" style="height:52px;border-radius:99px;width:60%;margin:0 auto;"></div></div>`;
+  if (type === 'building') return `<div style="text-align:center;padding:20px 0">
+    <div class="skel-line" style="height:82px;width:82px;border-radius:50%;margin:0 auto 28px;"></div>
+    <div class="skel-line" style="height:28px;width:55%;margin:0 auto 10px;border-radius:8px;"></div>
+    <div class="skel-line" style="height:16px;width:80%;margin:0 auto 8px;border-radius:6px;"></div>
+    <div class="skel-line" style="height:16px;width:65%;margin:0 auto 28px;border-radius:6px;"></div>
+    ${[1,2,3,4,5].map(()=>`<div class="skel-line" style="height:14px;width:300px;margin:0 auto 12px;border-radius:6px;"></div>`).join('')}</div>`;
+  if (type === 'results') return `<div class="skel-line" style="height:36px;width:75%;margin-bottom:10px;border-radius:10px;"></div>
+    <div class="skel-line" style="height:28px;width:55%;margin-bottom:22px;border-radius:8px;"></div>
+    <div class="skel-line" style="height:14px;width:95%;margin-bottom:8px;"></div>
+    <div class="skel-line" style="height:14px;width:82%;margin-bottom:8px;"></div>
+    <div class="skel-line" style="height:14px;width:70%;margin-bottom:22px;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">${[1,2,3].map(()=>`<div class="skel-line" style="height:72px;border-radius:14px;margin:0;"></div>`).join('')}</div>`;
+  if (type === 'word') return `<div class="skel-line sk-tag"></div>
+    <div class="skel-line sk-h1"></div><div class="skel-line sk-h2"></div>
+    <div class="skel-line sk-sub1"></div><div class="skel-line sk-sub2"></div>
+    <div class="skel-line" style="height:66px;border-radius:16px;width:100%;margin-top:8px;"></div>`;
+  return `<div class="skel-line sk-tag"></div>
+    <div class="skel-line sk-h1"></div><div class="skel-line sk-h2"></div>
+    <div class="skel-line sk-sub1"></div><div class="skel-line sk-sub2"></div>
+    <div class="skel-line sk-opt"></div><div class="skel-line sk-opt2"></div>
+    <div class="skel-line sk-opt3"></div><div class="skel-line sk-opt4"></div>`;
+}
+
+/* ════════════════════════════ RENDER WELCOME */
+function renderWelcome() {
+  return `<div class="card active" id="sc-welcome" style="max-width:596px;">
+    <div class="skel-overlay">${skelInner('welcome')}</div>
+    <div class="wlc-eyebrow">Historical Communicator Archetype Report <span class="wlc-rule"></span></div>
+    <div class="progress-hint"><span class="hint-dot"></span> 15 archetypes · 2,500 years of history</div>
+    <h1 class="wlc-title">Which voice from<br>history do you<br><em>communicate like?</em></h1>
+    <p class="wlc-body">From Socrates to Oprah. From Lincoln to Steve Jobs. In 22 questions, Conversly maps your communication DNA across 2,500 years of history and reveals the exact historical communicator you most closely mirror — and why that changes everything about how you grow.</p>
+    <div class="testimonial">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-quote">I got Lincoln. My coach said the same thing three years ago. I never knew what it meant until Conversly showed me exactly how to use it — now I lead every meeting with a story and I have not lost a single room since.</p>
+      <div class="test-author">
+        <div class="test-avatar">J</div>
+        <div><div class="test-name">James K.</div><div class="test-role">VP of Strategy · Fortune 500</div></div>
+      </div>
+    </div>
+    <div class="sp-row">
+      <div class="sp-faces"><div class="sp-face f1">A</div><div class="sp-face f2">M</div><div class="sp-face f3">S</div><div class="sp-face f4">D</div></div>
+      <span class="sp-text"><strong>50,000+</strong> archetypes revealed worldwide</span>
+    </div>
+    <button class="btn-start" onclick="nextScreen()">Reveal My Archetype &nbsp; ${svgR()}</button>
+    <div class="trust-row">
+      <span class="trust-item">${svgLock()} &nbsp;100% private</span>
+      <span class="trust-item">${svgClock()} &nbsp;4 minutes</span>
+      <span class="trust-item">${svgShield()} &nbsp;15 archetypes</span>
+    </div>
+    <p class="wlc-fine">Your answers are private and used only to generate your personal historical communicator profile.</p>
+  </div>`;
+}
+
+/* ════════════════════════════ RENDER Q */
+function renderQ(s) {
+  const opts = s.opts.map(o => `
+    <button class="opt" data-val="${o.val}" onclick="selectOpt(this,'${s.id}')">
+      <span class="opt-glow"></span><span class="opt-accent"></span>
+      <span class="opt-lbl">${o.lbl}</span>
+      <span class="opt-radio">${svgCheck()}</span>
+    </button>`).join('');
+  const noteHTML = s.note ? `<div class="q-note">${svgLock()}&nbsp;${s.note}</div>` : '';
+  return `<div class="card active" id="sc-${s.id}">
+    <div class="skel-overlay">${skelInner('q')}</div>
+    <div class="q-tag"><span class="q-dot"></span>${s.tag}</div>
+    <h2 class="q-text">${s.text}</h2>
+    <p class="q-sub">${s.sub}</p>
+    ${noteHTML}
+    <div class="opts">${opts}</div>
+    <div class="nav">
+      <button class="btn-back" onclick="prevScreen()">${svgL()}&nbsp; Back</button>
+      <button class="btn-next" id="btn-${s.id}" onclick="nextScreen()">Continue &nbsp;${svgR()}</button>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════ RENDER WORD */
+function renderWord(s) {
+  return `<div class="card active" id="sc-${s.id}">
+    <div class="skel-overlay">${skelInner('word')}</div>
+    <div class="q-tag"><span class="q-dot"></span>${s.tag}</div>
+    <h2 class="q-text">${s.text}</h2>
+    <p class="q-sub">${s.sub}</p>
+    <input class="txt-in" id="ti-${s.id}" placeholder="${s.placeholder}" maxlength="28"
+      oninput="onText('${s.id}','${s.key}',this.value)"
+      onkeydown="if(event.key==='Enter'&&this.value.trim())nextScreen()">
+    <div class="nav">
+      <button class="btn-back" onclick="prevScreen()">${svgL()}&nbsp; Back</button>
+      <button class="btn-next" id="btn-${s.id}" onclick="nextScreen()">Reveal My Archetype &nbsp; ✦</button>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════ RENDER INSIGHT 1 */
+function renderInsight1() {
+  const ans = S.answers['q1'] || '';
+  const archetypeGroups = [
+    { key: 'socrates', lbl: 'The Questioning Mind', pct: 12 },
+    { key: 'mlk,douglass', lbl: 'The Prophetic/Moral Voice', pct: 18 },
+    { key: 'lincoln,maya', lbl: 'The Storytelling Soul', pct: 21 },
+    { key: 'napoleon,roosevelt_t', lbl: 'The Commanding Force', pct: 11 },
+    { key: 'jfk,churchill', lbl: 'The Inspiring Orator', pct: 16 },
+    { key: 'oprah,eleanor,cleopatra', lbl: 'The Deep Connector', pct: 22 },
+  ];
+  const barsHTML = archetypeGroups.map(b => `
+    <div class="bar-row">
+      <div class="bar-row-lbl">${b.lbl}</div>
+      <div class="bar-track"><div class="bar-fill" data-pct="${b.pct}" style="width:0%"></div></div>
+      <span class="bar-pct">${b.pct}%</span>
+    </div>`).join('');
+  return `<div class="card-c active" id="sc-insight1">
+    <div class="ins-glass">
+      <div class="skel-overlay" style="border-radius:var(--cr);">${skelInner('insight')}</div>
+      <div class="ins-tag"><span class="q-dot"></span>Data · 50,000 Conversly Archetype Profiles</div>
+      <h2 class="ins-title">Six archetypal traditions have<br>shaped all great communication.</h2>
+      <p class="ins-body">Across 2,500 years of human history, every communicator who moved nations, shifted cultures, or changed minds drew from one of six deep traditions. Most people spend their entire careers unconsciously borrowing from the wrong one. <strong>Your profile will tell you exactly which tradition is native to you.</strong></p>
+      <div class="chart-wrap">
+        <div class="chart-title">Distribution of Communication Archetypes — 50,000 Conversly Users</div>
+        <div class="chart-source">Source: Conversly Archetype Analysis · 2024</div>
+        ${barsHTML}
+      </div>
+      <button class="btn-cont" onclick="nextScreen()">Continue My Profile &nbsp;${svgR()}</button>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════ RENDER INSIGHT 2 */
+function renderInsight2() {
+  const eras = [
+    { lbl:'Ancient\n470BC–30BC', sub:'Socrates · Cicero · Cleopatra', dot: true },
+    { lbl:'19th Century', sub:'Lincoln · Douglass · Roosevelt', dot: false },
+    { lbl:'Mid-20th C.', sub:'Churchill · Eleanor · MLK · JFK', dot: false },
+    { lbl:'Late 20th C.', sub:'Maya · Jobs · Oprah', dot: false },
+    { lbl:'21st Century', sub:'Obama & Beyond', dot: false },
+  ];
+  return `<div class="card-c active" id="sc-insight2">
+    <div class="ins-glass">
+      <div class="skel-overlay" style="border-radius:var(--cr);">${skelInner('insight')}</div>
+      <div class="ins-tag"><span class="q-dot"></span>Historical Context · Communication Across the Ages</div>
+      <h2 class="ins-title">The greatest communicators shared one trait across every era.</h2>
+      <p class="ins-body">Whether Cleopatra in 48 BC or Steve Jobs in 2007, the communicators who changed history did so because they operated from <strong>complete self-knowledge</strong> — they knew exactly who they were communicating as, not just what they were saying. That self-knowledge is what your archetype unlocks.</p>
+      <div class="stat-cards">
+        <div class="stat-card"><div class="stat-num">15</div><div class="stat-lbl">Distinct historical communicator archetypes in your profile</div></div>
+        <div class="stat-card"><div class="stat-num">2,500</div><div class="stat-lbl">Years of human communication history analyzed</div></div>
+        <div class="stat-card"><div class="stat-num">7</div><div class="stat-lbl">Core dimensions mapped across every archetype</div></div>
+      </div>
+      <div style="background:rgba(123,63,242,.05);border:1px solid rgba(123,63,242,.14);border-radius:16px;padding:16px 20px;margin-bottom:20px;">
+        <div style="font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--vi-pale);margin-bottom:8px;">The dimension most people never discover</div>
+        <div style="font-size:13px;line-height:1.64;color:var(--txt2);font-weight:300;">The next section maps your communication across seven dimensions that the greatest communicators in history mastered — vocal register, strategic intent, emotional architecture, narrative style, presence, influence method, and legacy orientation. Most people never articulate these about themselves. You're about to.</div>
+      </div>
+      <button class="btn-cont" onclick="nextScreen()">Map My Dimensions &nbsp;${svgR()}</button>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════ RENDER MOMENTUM */
+function renderMomentum(s) {
+  let statsHTML = '';
+  if (s.showStats) {
+    statsHTML = `<div class="stat-cards" style="margin-bottom:20px;">
+      <div class="stat-card"><div class="stat-num">94%</div><div class="stat-lbl">Report their archetype match feels immediately recognizable</div></div>
+      <div class="stat-card"><div class="stat-num">3.2×</div><div class="stat-lbl">More likely to build lasting communication habits with archetype self-knowledge</div><div class="stat-src">Conversly Internal Data, 2024</div></div>
+      <div class="stat-card"><div class="stat-num">12</div><div class="stat-lbl">Minutes average for users to name a specific moment their archetype showed up</div></div>
+    </div>`;
+  }
+  return `<div class="card-c active" id="sc-${s.id}">
+    <div class="mom-wrap">
+      <div class="skel-overlay" style="border-radius:var(--cr);">${skelInner('momentum')}</div>
+      <div class="mom-pct">${s.pct}%</div>
+      <div class="mom-pct-lbl">Profile Complete</div>
+      <div class="mom-rule"></div>
+      <h2 class="mom-title">${s.title}</h2>
+      <p class="mom-body">${s.body}</p>
+      ${statsHTML}
+      <div class="recip-box">
+        <div class="recip-label">${s.recipLabel}</div>
+        <div class="recip-text">${s.recipText}</div>
+      </div>
+      <div class="loss-box">
+        <div class="loss-label">⚠ The cost of not knowing your archetype</div>
+        <div class="loss-text">${s.lossText}</div>
+      </div>
+      <button class="btn-cont" onclick="nextScreen()">Continue &nbsp;${svgR()}</button>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════ RENDER BUILDING */
+function renderBuilding() {
+  return `<div class="card-c active" id="sc-building">
+    <div class="bld-wrap">
+      <div class="skel-overlay" style="border-radius:var(--cr);">${skelInner('building')}</div>
+      <div class="bld-ring-outer">
+        <div class="bld-ring"></div>
+        <div class="bld-ring-inner"></div>
+        <div class="bld-gem">✦</div>
+      </div>
+      <div class="bld-tag">Analyzing Your Archetype</div>
+      <h2 class="bld-title">Searching 2,500 years…</h2>
+      <p class="bld-sub">Mapping your answers across every major communication tradition<br>from Ancient Athens to the present day.</p>
+      <div class="bld-steps">
+        <div class="bld-step active" id="bs1"><span class="step-dot"></span>Analyzing your core communication instincts</div>
+        <div class="bld-step" id="bs2"><span class="step-dot"></span>Mapping your style across 7 dimensions</div>
+        <div class="bld-step" id="bs3"><span class="step-dot"></span>Matching against 15 historical figures</div>
+        <div class="bld-step" id="bs4"><span class="step-dot"></span>Identifying your secondary influence</div>
+        <div class="bld-step" id="bs5"><span class="step-dot"></span>Generating your Communication DNA radar</div>
+        <div class="bld-step" id="bs6"><span class="step-dot"></span>Preparing your full archetype profile</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════ SCORE COMPUTATION */
+function getScores() {
+  const totals = {};
+  Object.keys(FIGURES).forEach(k => totals[k] = 0);
+  SCREENS.forEach(screen => {
+    if (!screen.opts) return;
+    const ans = S.answers[screen.id];
+    if (!ans) return;
+    const opt = screen.opts.find(o => o.val === ans);
+    if (!opt || !opt.pts) return;
+    Object.entries(opt.pts).forEach(([fig, pts]) => {
+      totals[fig] = (totals[fig] || 0) + pts;
+    });
+  });
+  return totals;
+}
+
+/* ════════════════════════════ RADAR SVG */
+function buildRadarSVG(fig) {
+  const dim = {
+    'Oratory Power':    { socrates:55, cicero:95, lincoln:75, douglass:85, roosevelt_t:80, churchill:95, eleanor:65, mlk:98, jfk:88, maya:80, jobs:72, obama:85, oprah:78, cleopatra:70, napoleon:82 },
+    'Emotional Depth':  { socrates:50, cicero:55, lincoln:80, douglass:88, roosevelt_t:70, churchill:75, eleanor:82, mlk:98, jfk:70, maya:95, jobs:60, obama:80, oprah:95, cleopatra:80, napoleon:45 },
+    'Logic & Structure':{ socrates:95, cicero:92, lincoln:75, douglass:70, roosevelt_t:60, churchill:70, eleanor:68, mlk:72, jfk:75, maya:55, jobs:80, obama:90, oprah:55, cleopatra:80, napoleon:88 },
+    'Narrative Craft':  { socrates:70, cicero:75, lincoln:96, douglass:85, roosevelt_t:60, churchill:82, eleanor:70, mlk:95, jfk:72, maya:95, jobs:88, obama:82, oprah:90, cleopatra:72, napoleon:60 },
+    'Commanding Presence':{ socrates:65, cicero:80, lincoln:70, douglass:78, roosevelt_t:95, churchill:95, eleanor:72, mlk:90, jfk:92, maya:70, jobs:88, obama:85, oprah:82, cleopatra:90, napoleon:98 },
+    'Persuasive Force': { socrates:88, cicero:90, lincoln:82, douglass:85, roosevelt_t:80, churchill:88, eleanor:78, mlk:92, jfk:88, maya:80, jobs:92, obama:85, oprah:88, cleopatra:90, napoleon:90 },
+  };
+  const axes = Object.keys(dim);
+  const scores = axes.map(a => (dim[a][fig] || 60) / 100);
+  const n = axes.length;
+  const cx = 140, cy = 132, maxR = 94;
+  const angle = i => (Math.PI * 2 * i / n) - Math.PI / 2;
+  const pt = (r, i) => ({ x: cx + r * Math.cos(angle(i)), y: cy + r * Math.sin(angle(i)) });
+  let gridSVG = '';
+  [0.25, 0.5, 0.75, 1].forEach(f => {
+    const pts = axes.map((_, i) => pt(maxR * f, i));
+    const d = pts.map((p, i) => `${i===0?'M':'L'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + 'Z';
+    gridSVG += `<path d="${d}" fill="none" stroke="rgba(255,255,255,${f===1?0.055:0.028})" stroke-width="1"/>`;
+  });
+  const axesSVG = axes.map((_, i) => { const p = pt(maxR, i); return `<line x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`; }).join('');
+  const scorePts = scores.map((s, i) => pt(maxR * s, i));
+  const scoreD = scorePts.map((p, i) => `${i===0?'M':'L'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + 'Z';
+  const labelsSVG = axes.map((a, i) => {
+    const p = pt(maxR + 20, i);
+    const anchor = p.x < cx - 8 ? 'end' : p.x > cx + 8 ? 'start' : 'middle';
+    return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle" font-size="8.5" fill="rgba(210,195,240,0.5)" font-family="DM Sans,sans-serif">${a}</text>`;
+  }).join('');
+  const dotsSVG = scorePts.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="rgba(201,146,10,0.9)" opacity="0"/>`).join('');
+  return `<svg id="radar-svg" viewBox="0 0 280 264" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="rGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="rgba(123,63,242,0.32)"/>
+      <stop offset="100%" stop-color="rgba(201,146,10,0.1)"/>
+    </linearGradient></defs>
+    ${gridSVG}${axesSVG}
+    <path id="radar-path" d="${scoreD}" fill="url(#rGrad)" stroke="rgba(201,146,10,0.7)" stroke-width="1.5" opacity="0"/>
+    ${dotsSVG}${labelsSVG}
+  </svg>`;
+}
+
+/* ════════════════════════════ PORTRAIT SVG */
+function buildPortraitSVG(figKey) {
+  const fig = FIGURES[figKey];
+  const [c1, c2] = fig.portraitBg;
+  const sym = fig.portraitSymbol;
+  const ac = fig.colorAccent;
+  return `<svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg" class="figure-portrait-svg">
+    <defs>
+      <radialGradient id="pGrad" cx="50%" cy="40%" r="60%">
+        <stop offset="0%" stop-color="${c2}"/>
+        <stop offset="100%" stop-color="${c1}"/>
+      </radialGradient>
+      <filter id="pGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <rect width="110" height="110" rx="20" fill="url(#pGrad)"/>
+    <rect width="110" height="110" rx="20" fill="none" stroke="${ac}" stroke-width="1" stroke-opacity="0.5"/>
+    <rect x="2" y="2" width="106" height="106" rx="18" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <!-- Decorative rings -->
+    <circle cx="55" cy="55" r="38" fill="none" stroke="${ac}" stroke-width="0.6" stroke-opacity="0.2" stroke-dasharray="4 6"/>
+    <circle cx="55" cy="55" r="28" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    <!-- Inner circle -->
+    <circle cx="55" cy="55" r="24" fill="${ac}" fill-opacity="0.1"/>
+    <!-- Symbol -->
+    <text x="55" y="63" text-anchor="middle" font-size="28" filter="url(#pGlow)">${sym}</text>
+    <!-- Corner ornaments -->
+    <circle cx="16" cy="16" r="2" fill="${ac}" fill-opacity="0.4"/>
+    <circle cx="94" cy="16" r="2" fill="${ac}" fill-opacity="0.4"/>
+    <circle cx="16" cy="94" r="2" fill="${ac}" fill-opacity="0.4"/>
+    <circle cx="94" cy="94" r="2" fill="${ac}" fill-opacity="0.4"/>
+  </svg>`;
+}
+
+/* ════════════════════════════ ERA TIMELINE */
+function buildEraTimeline(figKey) {
+  const eraMap = {
+    socrates:'Ancient',cicero:'Ancient',cleopatra:'Ancient',
+    lincoln:'19th C.',douglass:'19th C.',napoleon:'19th C.',roosevelt_t:'19th C.',
+    churchill:'Early 20th',eleanor:'Early 20th',mlk:'Mid 20th',jfk:'Mid 20th',
+    maya:'Late 20th',jobs:'Late 20th',oprah:'Late 20th',obama:'21st C.',
+  };
+  const eras = ['Ancient','19th C.','Early 20th','Mid 20th','Late 20th','21st C.'];
+  const active = eraMap[figKey] || 'Late 20th';
+  const aIdx = eras.indexOf(active);
+  const fillPct = (aIdx / (eras.length - 1)) * 100;
+  const dotsHTML = eras.map((e, i) => `
+    <div class="era-pt">
+      <div class="era-dot${i === aIdx ? ' active' : ''}"></div>
+      <div class="era-lbl${i === aIdx ? ' active' : ''}">${e}</div>
+    </div>`).join('');
+  return `<div style="margin-bottom:22px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt3);margin-bottom:14px;">Your Historical Era</div>
+    <div class="era-timeline">
+      <div class="era-track">
+        <div class="era-fill" style="width:${fillPct}%"></div>
+      </div>
+      <div class="era-points">${dotsHTML}</div>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════ RENDER RESULTS */
+function renderResults() {
+  const scores = getScores();
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const [primaryKey] = sorted[0];
+  const [secondaryKey] = sorted[1];
+  const primaryFig = FIGURES[primaryKey];
+  const secondaryFig = FIGURES[secondaryKey];
+  const totalScore = sorted[0][1];
+  const secPct = Math.round((sorted[1][1] / totalScore) * 68 + 14);
+  const oneWord = S.answers['one_word'] ? (S.answers['one_word'].charAt(0).toUpperCase() + S.answers['one_word'].slice(1)) : 'Unforgettable';
+
+  return `<div class="card-c active" id="sc-results">
+    <div style="width:100%;max-width:640px;margin:0 auto;">
+
+      <!-- PRIMARY FIGURE -->
+      <div class="res-glass">
+        <div class="skel-overlay" style="border-radius:var(--cr);">${skelInner('results')}</div>
+        <div class="fig-era-badge">✦ &nbsp;${primaryFig.era}</div>
+        <div class="figure-reveal">
+          <div class="figure-portrait">${buildPortraitSVG(primaryKey)}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="fig-archetype-tag">Your Communication Archetype</div>
+            <div class="fig-name">${primaryFig.name}</div>
+            <div class="fig-title">${primaryFig.title}</div>
+          </div>
+        </div>
+        <div class="fig-quote-block">
+          <div class="fig-quote">${primaryFig.quote}</div>
+          <div class="fig-quote-src">${primaryFig.quoteSource}</div>
+        </div>
+        <p class="fig-insight">${primaryFig.insight}</p>
+        <div class="fig-traits">${primaryFig.traits.map(t => `<span class="fig-trait">${t}</span>`).join('')}</div>
+        <div class="profile-keys">
+          <div class="pkey"><div class="pkey-label">Your North Star</div><div class="pkey-val">${oneWord}</div></div>
+          <div class="pkey"><div class="pkey-label">Greatest Strength</div><div class="pkey-val">${primaryFig.strengthNote.split('.')[0]}</div></div>
+          <div class="pkey"><div class="pkey-label">Watch Out For</div><div class="pkey-val">${primaryFig.watchOut.split('.')[0]}</div></div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="res-layout">
+        <div class="chart-panel">
+          <div class="cp-title">Communication DNA</div>
+          ${buildRadarSVG(primaryKey)}
+        </div>
+        <div class="chart-panel" style="justify-content:space-between;">
+          <div class="cp-title">Secondary Influence</div>
+          <div style="text-align:center;padding:10px 0 14px;">
+            <div style="font-size:40px;margin-bottom:8px;">${secondaryFig.icon}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--txt);margin-bottom:4px;">${secondaryFig.name}</div>
+            <div style="font-size:12px;color:var(--txt3);font-style:italic;margin-bottom:12px;">${secondaryFig.title}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:38px;font-weight:700;background:linear-gradient(135deg,var(--gold-pale),var(--gold-hi));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${secPct}%</div>
+            <div style="font-size:10px;color:var(--txt3);letter-spacing:.1em;text-transform:uppercase;">influence on your profile</div>
+          </div>
+          <div style="background:rgba(255,255,255,.018);border:1px solid var(--border2);border-radius:12px;padding:12px;text-align:left;">
+            <div style="font-size:10.5px;line-height:1.6;color:var(--txt2);font-weight:300;font-style:italic;">"${secondaryFig.traits[0]} meets ${primaryFig.traits[0]} — a rare and powerful combination."</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ERA TIMELINE + MODERN EQUIV -->
+      <div class="modern-panel">
+        ${buildEraTimeline(primaryKey)}
+        <div class="modern-eyebrow">Your Legendary Moment</div>
+        <div class="modern-title">${primaryFig.legendaryMoment}</div>
+        <div style="height:1px;background:var(--border2);margin:14px 0;"></div>
+        <div class="modern-eyebrow" style="margin-top:0;">If You Were Alive Today, You'd Be…</div>
+        <div style="font-size:13.5px;line-height:1.72;color:var(--txt2);font-weight:300;">${primaryFig.modernEquivalent}</div>
+      </div>
+
+      <!-- CONVERSLY CTA -->
+      <div class="dl-panel">
+        <div style="margin-bottom:18px;">
+          <div style="font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--vi-bright);margin-bottom:10px;">What Comes Next</div>
+          <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--txt);margin-bottom:8px;letter-spacing:-.016em;">Train the communication style<br>you were already built for.</div>
+          <div style="font-size:13.5px;line-height:1.72;color:var(--txt2);font-weight:300;">Knowing your archetype is only the beginning. <strong style="color:var(--txt);">Conversly</strong> builds your coaching curriculum directly around who you naturally are — amplifying your native strengths, rewiring your specific gaps, and turning your ${primaryFig.name}-style communication into a fully reliable, daily practice.</div>
+        </div>
+        <div style="background:rgba(201,146,10,.05);border:1px solid rgba(201,146,10,.18);border-radius:16px;padding:14px 18px;margin-bottom:20px;">
+          <div style="font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-pale);margin-bottom:6px;">Your personalized starting point</div>
+          <div style="font-size:13px;line-height:1.62;color:rgba(229,200,120,.75);font-weight:300;">Your first Conversly session will be built around your ${primaryFig.title} archetype — starting with the exact scenario where your pattern most needs development, and amplifying the gifts that are already yours.</div>
+        </div>
+        <div class="store-row">
+          <a class="store-btn apple-btn" href="https://apps.apple.com/app/conversly-communication-gym/id6753739129" target="_blank" rel="noopener">
+            <div class="s-icon">
+              <svg width="26" height="32" viewBox="0 0 26 32" fill="none"><path d="M21.7 17.3c-.034-3.84 3.145-5.697 3.291-5.786-1.796-2.622-4.586-2.983-5.574-3.022-2.358-.24-4.61 1.393-5.808 1.393-1.198 0-3.034-1.361-4.994-1.323-2.562.04-4.935 1.497-6.249 3.775-2.661 4.609-.689 11.43 1.915 15.176 1.265 1.83 2.765 3.886 4.741 3.814 1.909-.077 2.629-1.226 4.941-1.226 2.311 0 2.96 1.226 4.98 1.188 2.056-.039 3.354-1.868 4.597-3.704 1.457-2.118 2.057-4.171 2.088-4.278-.044-.02-4-1.537-4.034-6.007zM17.925 5.405c1.047-1.283 1.758-3.055 1.566-4.825-1.514.062-3.347 1.012-4.43 2.29-.972 1.124-1.824 2.927-1.595 4.659 1.69.132 3.41-.86 4.459-2.124z" fill="white"/></svg>
+            </div>
+            <div><div class="s-sub">Download on the</div><div class="s-name">App Store</div></div>
+          </a>
+          <a class="store-btn play-btn" href="https://play.google.com/store/apps/details?id=com.conversly.app" target="_blank" rel="noopener">
+            <div class="s-icon">
+              <svg width="26" height="29" viewBox="0 0 26 29" fill="none"><path d="M.5.72C.18 1.06 0 1.59 0 2.28v24.44c0 .69.18 1.22.5 1.56l.08.08L14.06 14.5v-.35L.58.64.5.72z" fill="url(#gp1r)"/><path d="M18.67 19.18l-4.61-4.68v-.35l4.61-4.68.1.06 5.46 3.11c1.56.89 1.56 2.34 0 3.23l-5.46 3.11-.1.06z" fill="url(#gp2r)"/><path d="M18.77 19.12L14.06 14.5.5 28.28c.51.55 1.36.62 2.33.07l15.94-9.23z" fill="url(#gp3r)"/><path d="M18.77 9.88L2.83.65C1.86.1 1.01.17.5.72L14.06 14.5l4.71-4.62z" fill="url(#gp4r)"/>
+              <defs><linearGradient id="gp1r" x1="12.85" y1="1.75" x2="-6.1" y2="14.42" gradientUnits="userSpaceOnUse"><stop stop-color="#00A0FF"/><stop offset="1" stop-color="#00E3FF"/></linearGradient><linearGradient id="gp2r" x1="25.08" y1="14.17" x2="-.51" y2="14.17" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE000"/><stop offset="1" stop-color="#FF9C00"/></linearGradient><linearGradient id="gp3r" x1="16.24" y1="16.68" x2="-8.03" y2="45.75" gradientUnits="userSpaceOnUse"><stop stop-color="#FF3A44"/><stop offset="1" stop-color="#C31162"/></linearGradient><linearGradient id="gp4r" x1="-2.54" y1="-10.6" x2="8.48" y2="5.54" gradientUnits="userSpaceOnUse"><stop stop-color="#32A071"/><stop offset="1" stop-color="#00F076"/></linearGradient></defs></svg>
+            </div>
+            <div><div class="s-sub">Get it on</div><div class="s-name">Google Play</div></div>
+          </a>
+        </div>
+        <p class="dl-fine">Free to start · No credit card · Your ${primaryFig.name} curriculum activates on first launch</p>
+      </div>
+
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════ DISPATCH */
+function renderScreen(s) {
+  switch(s.type) {
+    case 'welcome':   return renderWelcome();
+    case 'q':        return renderQ(s);
+    case 'word':     return renderWord(s);
+    case 'insight1': return renderInsight1();
+    case 'insight2': return renderInsight2();
+    case 'momentum': return renderMomentum(s);
+    case 'building': return renderBuilding();
+    case 'results':  return renderResults();
+  }
+}
+
+/* ════════════════════════════ MOUNT */
+function mount(idx, dir) {
+  const el = document.getElementById('screens');
+  const spacer = document.getElementById('screensSpacer');
+  const s = SCREENS[idx];
+  const tmp = document.createElement('div');
+  tmp.innerHTML = renderScreen(s);
+  const newEl = tmp.firstElementChild;
+  const isCenter = newEl.classList.contains('card-c');
+  if (isCenter) { newEl.classList.remove('active'); newEl.classList.add('gone'); }
+  else { newEl.classList.remove('active'); newEl.classList.add(dir === 'fwd' ? 'in-r' : 'in-l'); }
+  el.insertBefore(newEl, spacer);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    newEl.classList.remove('in-r', 'in-l', 'gone');
+    newEl.classList.add('active');
+    postMount(s);
+    updateSpacerHeight();
+  }));
+  el.querySelectorAll(':scope > *').forEach(child => {
+    if (child === newEl || child === spacer) return;
+    child.classList.remove('active');
+    child.classList.add(child.classList.contains('card-c') ? 'gone' : (dir === 'fwd' ? 'out-l' : 'out-r'));
+    setTimeout(() => child.remove(), 480);
+  });
+  updateHUD(idx);
+  restore(s);
+}
+
+function updateSpacerHeight() {
+  const spacer = document.getElementById('screensSpacer');
+  const screens = document.getElementById('screens');
+  const active = screens.querySelector('.card.active, .card-c.active');
+  if (active && spacer) spacer.style.height = active.offsetHeight + 'px';
+  requestAnimationFrame(() => {
+    const a2 = screens.querySelector('.card.active, .card-c.active');
+    if (a2 && spacer) spacer.style.height = a2.offsetHeight + 'px';
+  });
+}
+
+function updateHUD(idx) {
+  const p = pct(idx);
+  document.getElementById('progFill').style.width = p + '%';
+  document.getElementById('qCounter').textContent = qLabel(idx);
+  document.querySelectorAll('.prog-ms').forEach(el => {
+    el.classList.toggle('passed', p >= parseInt(el.dataset.at));
+  });
+}
+
+function restore(s) {
+  if (s.type === 'q' && S.answers[s.id]) {
+    const o = document.querySelector(`[data-val="${S.answers[s.id]}"]`);
+    if (o) { o.classList.add('sel'); document.getElementById('btn-' + s.id)?.classList.add('on'); }
+  }
+  if (s.type === 'word' && S.answers[s.key]) {
+    const t = document.getElementById('ti-' + s.id);
+    if (t) { t.value = S.answers[s.key]; document.getElementById('btn-' + s.id)?.classList.add('on'); }
+  }
+}
+
+function postMount(s) {
+  if (s.type === 'insight1') {
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+    }, 200);
+  }
+  if (s.type === 'building') animateBuild();
+  if (s.type === 'results') { setTimeout(animateResults, 350); spawnConfetti(); }
+}
+
+/* ════════════════════════════ INTERACTIONS */
+function selectOpt(btn, sid) {
+  btn.closest('.opts').querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+  btn.classList.add('sel');
+  S.answers[sid] = btn.dataset.val;
+  document.getElementById('btn-' + sid)?.classList.add('on');
+  setTimeout(() => { if (document.getElementById('btn-' + sid)?.classList.contains('on')) nextScreen(); }, 360);
+}
+function onText(sid, key, val) {
+  S.answers[key] = val.trim();
+  const btn = document.getElementById('btn-' + sid);
+  if (btn) btn.classList.toggle('on', val.trim().length > 0);
+}
+function nextScreen() { if (S.screen < SCREENS.length - 1) { S.screen++; mount(S.screen, 'fwd'); } }
+function prevScreen() { if (S.screen > 0) { S.screen--; mount(S.screen, 'bwd'); } }
+
+/* ════════════════════════════ BUILD ANIMATION */
+function animateBuild() {
+  const ids = ['bs1','bs2','bs3','bs4','bs5','bs6'];
+  let i = 0;
+  const tick = () => {
+    if (i > 0) { const p = document.getElementById(ids[i-1]); if (p) { p.classList.remove('active'); p.classList.add('done'); } }
+    if (i < ids.length) { const c = document.getElementById(ids[i]); if (c) c.classList.add('active'); i++; setTimeout(tick, 620); }
+    else { setTimeout(() => nextScreen(), 380); }
+  };
+  setTimeout(tick, 460);
+}
+
+/* ════════════════════════════ RESULTS ANIMATION */
+function animateResults() {
+  const radarPath = document.getElementById('radar-path');
+  if (radarPath) {
+    radarPath.style.transition = 'opacity 1s ease';
+    requestAnimationFrame(() => { radarPath.style.opacity = '1'; });
+  }
+  document.querySelectorAll('#radar-svg circle').forEach((c, i) => {
+    c.style.transition = `opacity 0.4s ease ${0.6 + i * 0.1}s`;
+    requestAnimationFrame(() => { c.style.opacity = '0.95'; });
+  });
+}
+
+/* ════════════════════════════ CONFETTI */
+function spawnConfetti() {
+  const field = document.getElementById('confetti');
+  const colors = ['#7B3FF2','#9D6FFF','#BFA6FF','#C9920A','#E5B830','rgba(255,255,255,0.7)','#D4A017'];
+  for (let i = 0; i < 70; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'cp';
+      const size = 4 + Math.random() * 7;
+      el.style.cssText = `left:${Math.random()*100}%;top:-10px;width:${size}px;height:${size}px;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        animation-duration:${2.4+Math.random()*2.2}s;animation-delay:${Math.random()*0.7}s;
+        border-radius:${Math.random()>.5?'50%':'3px'};`;
+      field.appendChild(el);
+      setTimeout(() => el.remove(), 6000);
+    }, i * 40);
+  }
+}
+
+window.addEventListener('resize', updateSpacerHeight);
+mount(0, 'fwd');
+</script>
+</body>
+</html>
